@@ -37,7 +37,7 @@ jobs:
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ github.sha }}
           secrets: |
-            github_packages_token=${{ secrets.GITHUB_PACKAGES_TOKEN }}
+            github_packages_token=${{ secrets._PACKAGES_TOKEN }}
 
   deploy:
     needs: build
