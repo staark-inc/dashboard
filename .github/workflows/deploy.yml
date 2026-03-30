@@ -30,8 +30,8 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
-          context: ./dashboard
-          file: ./dashboard/Dockerfile
+          context: ./
+          file: ./Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/dashboard:latest
@@ -53,6 +53,6 @@ jobs:
           port: 22
           script: |
             cd /srv/docker/stacks/gateway
-            docker compose pull dashboard
-            docker compose up -d --no-deps dashboard
-            docker image prune -f
+            #docker compose pull dashboard
+            #docker compose up -d --no-deps dashboard
+            #docker image prune -f
