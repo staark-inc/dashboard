@@ -1,16 +1,31 @@
 # syntax=docker/dockerfile:1.7
-FROM node:20-alpine
 
+FROM node:20-alpine AS base
 WORKDIR /app
+
+FROM base AS deps
+
 COPY package*.json ./
 
+# Toolchain pentru pachete native dacă e nevoie
+RUN apk add --no-cache python3 make g++
+
+# Instalează dependențele folosind secretul din GitHub Actions
 RUN --mount=type=secret,id=github_packages_token \
-    TOKEN="$(cat /run/secrets/github_packages_token)" && \
-    printf "@staark-inc:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > /root/.npmrc && \
-    npm install --omit=dev && \
+    set -eux; \
+    TOKEN="$(cat /run/secrets/github_packages_token)"; \
+    test -n "$TOKEN"; \
+    printf "@staark-inc:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > /root/.npmrc; \
+    npm ci --omit=dev; \
     rm -f /root/.npmrc
 
+FROM base AS runtime
+
+ENV NODE_ENV=production
+
+COPY --from=deps /app/node_modules /app/node_modules
 COPY . .
 
 EXPOSE 3005
+
 CMD ["npm", "run", "start"]
