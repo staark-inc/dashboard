@@ -32,12 +32,12 @@ jobs:
           pwd
           ls -la
           find . -maxdepth 3 -type f | sort
-          
+
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
           context: ./
-          file: ./Dockerfile
+          file: ./Dockerfile.prod
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/dashboard:latest
