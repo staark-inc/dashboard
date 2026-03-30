@@ -1,0 +1,393 @@
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    margin-bottom: 1.4rem;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--text); }
+
+  .task-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.2rem;
+    align-items: start;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.8rem;
+  }
+
+  .sidebar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .form-group:last-child { margin-bottom: 0; }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .label-hint {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 0.4rem;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  textarea,
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.85rem;
+    color: var(--text);
+    font-family: var(--sans);
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  textarea:focus,
+  select:focus { border-color: var(--violet); }
+
+  input::placeholder, textarea::placeholder { color: var(--text-dim); }
+  textarea { resize: vertical; min-height: 120px; }
+
+  /* PRIORITY OPTIONS */
+  .priority-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .priority-option { position: relative; }
+  .priority-option input[type="radio"] {
+    position: absolute; opacity: 0;
+    width: 100%; height: 100%; cursor: pointer; margin: 0;
+  }
+
+  .priority-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0.5rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    text-align: center;
+  }
+
+  .priority-option input:checked + .priority-label {
+    border-color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .priority-label .p-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .priority-label .p-name { font-size: 0.7rem; font-weight: 500; color: var(--text-dim); text-transform: capitalize; }
+  .priority-option input:checked + .priority-label .p-name { color: var(--text); }
+
+  /* TAGS */
+  .tags-input-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.5rem 0.7rem;
+    min-height: 42px;
+    align-items: center;
+    cursor: text;
+    transition: border-color 0.2s;
+  }
+  .tags-input-wrap:focus-within { border-color: var(--violet); }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--violet-dim);
+    border: 1px solid rgba(124,92,252,0.25);
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.72rem;
+    color: var(--violet);
+  }
+
+  .tag-chip button {
+    background: none; border: none; cursor: pointer;
+    color: var(--violet); font-size: 0.7rem; padding: 0; line-height: 1; opacity: 0.6;
+  }
+  .tag-chip button:hover { opacity: 1; }
+
+  .tags-input {
+    background: none; border: none; outline: none;
+    font-size: 0.82rem; color: var(--text);
+    font-family: var(--sans); flex: 1; min-width: 80px; padding: 0.1rem 0;
+  }
+
+  .tags-hint { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+  /* SIDEBAR META */
+  .meta-item { display: flex; flex-direction: column; gap: 0.3rem; }
+  .meta-label { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
+  .meta-value { font-size: 0.78rem; color: var(--text); }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+    width: fit-content;
+  }
+
+  .status-pill.todo        { color: var(--text-dim); background: transparent;          border-color: var(--border); }
+  .status-pill.in_progress { color: var(--yellow);   background: rgba(245,197,66,0.1); border-color: rgba(245,197,66,0.2); }
+  .status-pill.in_review   { color: var(--violet);   background: var(--violet-dim);    border-color: rgba(124,92,252,0.2); }
+  .status-pill.done        { color: var(--cyan);     background: var(--cyan-dim);      border-color: rgba(0,229,176,0.2); }
+
+  /* ALERT */
+  .alert-error {
+    background: rgba(255,77,106,0.08);
+    border: 1px solid rgba(255,77,106,0.2);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--red);
+    margin-bottom: 1.2rem;
+  }
+
+  /* ACTIONS */
+  .form-actions {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 1.6rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    justify-content: space-between;
+  }
+
+  .form-actions-left { display: flex; gap: 0.7rem; }
+
+  .btn-primary {
+    background: var(--violet); color: #fff; border: none;
+    border-radius: 9px; padding: 0.65rem 1.3rem;
+    font-size: 0.85rem; font-weight: 600; font-family: var(--sans);
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    background: transparent; color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 9px;
+    padding: 0.65rem 1.3rem; font-size: 0.85rem; font-family: var(--sans);
+    cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+    transition: border-color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+  .btn-danger {
+    background: transparent; color: var(--red);
+    border: 1px solid rgba(255,77,106,0.3); border-radius: 9px;
+    padding: 0.65rem 1.3rem; font-size: 0.85rem; font-family: var(--sans);
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-danger:hover { background: var(--red-dim); }
+</style>
+
+<a href="/dashboard/projects/<%= project.id %>" class="back-link">← <%= project.name %></a>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert-error"><%= error %></div>
+<% } %>
+
+<div class="task-layout">
+
+  <!-- MAIN FORM -->
+  <div class="form-card">
+    <form action="/dashboard/projects/<%= project.id %>/tasks/<%= task.id %>/edit" method="POST">
+
+      <div class="form-group">
+        <label for="title">Title <span style="color:var(--red)">*</span></label>
+        <input type="text" id="title" name="title" value="<%= task.title %>" required />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description <span class="label-hint">optional</span></label>
+        <textarea id="description" name="description"><%= task.description || '' %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="priority-options">
+          <% [['low','var(--text-dim)'],['medium','var(--cyan)'],['high','var(--yellow)'],['urgent','var(--red)']].forEach(([p, color]) => { %>
+            <div class="priority-option">
+              <input type="radio" name="priority" id="p-<%= p %>" value="<%= p %>"
+                <%= task.priority === p ? 'checked' : '' %> />
+              <label class="priority-label" for="p-<%= p %>">
+                <span class="p-dot" style="background:<%= color %>"></span>
+                <span class="p-name"><%= p %></span>
+              </label>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tags <span class="label-hint">optional</span></label>
+        <div class="tags-input-wrap" id="tagsWrap">
+          <% (task.tags || []).forEach(tag => { %>
+            <span class="tag-chip" data-tag="<%= tag %>">
+              <%= tag %> <button type="button" onclick="removeTag('<%= tag %>', this)">×</button>
+            </span>
+          <% }) %>
+          <input type="text" class="tags-input" id="tagsInput" placeholder="Add tag..." />
+        </div>
+        <input type="hidden" name="tags" id="tagsHidden" value="<%= JSON.stringify(task.tags || []) %>" />
+        <div class="tags-hint">Press Enter or comma to add a tag</div>
+      </div>
+
+      <div class="form-actions">
+        <div class="form-actions-left">
+          <button type="submit" class="btn-primary">Save changes</button>
+          <a href="/dashboard/projects/<%= project.id %>" class="btn-ghost">Cancel</a>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar-card">
+
+    <div class="meta-item">
+      <div class="meta-label">Status</div>
+      <form action="/dashboard/projects/<%= project.id %>/tasks/<%= task.id %>/edit" method="POST" id="statusForm">
+        <input type="hidden" name="title" value="<%= task.title %>" />
+        <input type="hidden" name="priority" value="<%= task.priority %>" />
+        <input type="hidden" name="tags" value="<%= JSON.stringify(task.tags || []) %>" />
+        <select name="status" onchange="document.getElementById('statusForm').submit()"
+                style="margin-top:0.3rem">
+          <option value="todo"        <%= task.status === 'todo'        ? 'selected' : '' %>>Todo</option>
+          <option value="in_progress" <%= task.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+          <option value="in_review"   <%= task.status === 'in_review'   ? 'selected' : '' %>>In Review</option>
+          <option value="done"        <%= task.status === 'done'        ? 'selected' : '' %>>Done</option>
+        </select>
+      </form>
+    </div>
+
+    <div class="meta-item">
+      <div class="meta-label">Due date</div>
+      <form action="/dashboard/projects/<%= project.id %>/tasks/<%= task.id %>/edit" method="POST" id="dueForm">
+        <input type="hidden" name="title" value="<%= task.title %>" />
+        <input type="hidden" name="priority" value="<%= task.priority %>" />
+        <input type="hidden" name="status" value="<%= task.status %>" />
+        <input type="hidden" name="tags" value="<%= JSON.stringify(task.tags || []) %>" />
+        <input type="date" name="due_date"
+               value="<%= task.due_date || '' %>"
+               onchange="document.getElementById('dueForm').submit()"
+               style="margin-top:0.3rem" />
+      </form>
+    </div>
+
+    <div class="meta-item">
+      <div class="meta-label">Created</div>
+      <div class="meta-value"><%= new Date(task.created_at * 1000).toLocaleDateString('en-GB') %></div>
+    </div>
+
+    <div class="meta-item">
+      <div class="meta-label">Last updated</div>
+      <div class="meta-value"><%= new Date(task.updated_at * 1000).toLocaleDateString('en-GB') %></div>
+    </div>
+
+    <div class="meta-item" style="padding-top:0.8rem;border-top:1px solid var(--border)">
+      <form action="/dashboard/projects/<%= project.id %>/tasks/<%= task.id %>/delete" method="POST"
+            onsubmit="return confirm('Delete this task?')">
+        <button type="submit" class="btn-danger" style="width:100%">Delete task</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const tagsInput  = document.getElementById('tagsInput');
+  const tagsWrap   = document.getElementById('tagsWrap');
+  const tagsHidden = document.getElementById('tagsHidden');
+  let tags = <%- JSON.stringify(task.tags || []) %>;
+
+  function updateHidden() { tagsHidden.value = JSON.stringify(tags); }
+
+  function addTag(val) {
+    const tag = val.trim().replace(/,$/, '');
+    if (!tag || tags.includes(tag)) return;
+    tags.push(tag);
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.dataset.tag = tag;
+    chip.innerHTML = `${tag} <button type="button" onclick="removeTag('${tag}', this)">×</button>`;
+    tagsWrap.insertBefore(chip, tagsInput);
+    updateHidden();
+  }
+
+  function removeTag(tag, btn) {
+    tags = tags.filter(t => t !== tag);
+    btn.parentElement.remove();
+    updateHidden();
+  }
+
+  tagsInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addTag(tagsInput.value); tagsInput.value = ''; }
+    if (e.key === ',')     { e.preventDefault(); addTag(tagsInput.value); tagsInput.value = ''; }
+    if (e.key === 'Backspace' && !tagsInput.value && tags.length > 0) {
+      const last = tags[tags.length - 1];
+      const lastChip = tagsWrap.querySelector(`.tag-chip[data-tag="${last}"]`);
+      if (lastChip) removeTag(last, lastChip.querySelector('button'));
+    }
+  });
+
+  tagsWrap.addEventListener('click', () => tagsInput.focus());
+</script>

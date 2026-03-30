@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create account — Staark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d0f;
+      --surface:   #13131a;
+      --surface2:  #1a1a24;
+      --border:    #232334;
+      --text:      #e2e2f0;
+      --text-dim:  #6b6b8a;
+      --violet:    #7c5cfc;
+      --violet-dim:rgba(124,92,252,0.15);
+      --cyan:      #00e5b0;
+      --red:       #ff4d6a;
+      --mono: 'Courier New', monospace;
+      --sans: 'Inter', sans-serif;
+      --display: 'Bricolage Grotesque', sans-serif;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .auth-wrap {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .auth-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      text-decoration: none;
+      margin-bottom: 2.5rem;
+    }
+
+    .auth-logo .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--violet);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .auth-logo .logo-icon svg { width: 17px; height: 17px; fill: #fff; }
+
+    .auth-logo .wordmark {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2.2rem;
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-card h1 {
+      font-family: var(--display);
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+
+    .auth-card .subtitle {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-bottom: 1.8rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      font-family: var(--sans);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: var(--violet); }
+    input::placeholder { color: var(--text-dim); }
+
+    input.error { border-color: var(--red); }
+
+    .field-error {
+      font-size: 0.7rem;
+      color: var(--red);
+      margin-top: -0.6rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .alert {
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.78rem;
+      margin-bottom: 1rem;
+    }
+
+    .alert-error {
+      background: rgba(255,77,106,0.08);
+      border: 1px solid rgba(255,77,106,0.2);
+      color: var(--red);
+    }
+
+    .alert-success {
+      background: rgba(0,229,176,0.07);
+      border: 1px solid rgba(0,229,176,0.2);
+      color: var(--cyan);
+    }
+
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      margin-bottom: 1.4rem;
+      line-height: 1.5;
+    }
+
+    .terms-row input[type="checkbox"] {
+      width: 14px; height: 14px;
+      margin-top: 2px;
+      accent-color: var(--violet);
+      flex-shrink: 0;
+    }
+
+    .terms-row a { color: var(--violet); text-decoration: none; }
+    .terms-row a:hover { text-decoration: underline; }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--violet);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-bottom: 1.4rem;
+    }
+
+    .btn-submit:hover { opacity: 0.85; }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.4rem;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .login-link {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .login-link a {
+      color: var(--violet);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link a:hover { text-decoration: underline; }
+
+    .auth-page-footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 1.2rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    .auth-page-footer a { color: var(--text-dim); text-decoration: none; }
+    .auth-page-footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <div class="auth-wrap">
+
+    <a class="auth-logo" href="https://staark-app.cloud">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <span class="wordmark">Staark</span>
+    </a>
+
+    <div class="auth-card">
+      <h1>Create account</h1>
+      <p class="subtitle">Start for free — no credit card required</p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success"><%= success %></div>
+      <% } %>
+
+      <form action="/register" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First name</label>
+            <input type="text" id="firstName" name="firstName"
+              placeholder="John"
+              value="<%= typeof fields !== 'undefined' ? fields.firstName || '' : '' %>"
+              required />
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last name</label>
+            <input type="text" id="lastName" name="lastName"
+              placeholder="Doe"
+              value="<%= typeof fields !== 'undefined' ? fields.lastName || '' : '' %>"
+              required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email"
+            placeholder="you@company.com"
+            value="<%= typeof fields !== 'undefined' ? fields.email || '' : '' %>"
+            required autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password"
+            placeholder="Min. 8 characters"
+            required autocomplete="new-password" />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword"
+            placeholder="••••••••"
+            required autocomplete="new-password" />
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" name="terms" id="terms" required />
+          <label for="terms">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Create account →</button>
+      </form>
+
+      <div class="divider">already have an account?</div>
+
+      <div class="login-link">
+        <a href="/login">Sign in instead</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="auth-page-footer">
+    <a href="https://staark-app.cloud">© 2026 Staark</a> ·
+    <a href="#">Privacy</a> ·
+    <a href="#">Terms</a>
+  </div>
+
+</body>
+</html>

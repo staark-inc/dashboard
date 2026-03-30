@@ -1,0 +1,270 @@
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    margin-bottom: 1.4rem;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--text); }
+
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.8rem;
+    max-width: 560px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+
+  label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .label-hint {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 0.4rem;
+  }
+
+  input[type="text"], textarea, select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.85rem;
+    color: var(--text);
+    font-family: var(--sans);
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--violet); }
+  input::placeholder, textarea::placeholder { color: var(--text-dim); }
+  textarea { resize: vertical; min-height: 90px; }
+
+  .color-grid {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .color-option {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, transform 0.15s;
+    position: relative;
+  }
+
+  .color-option:hover { transform: scale(1.15); }
+  .color-option input[type="radio"] {
+    position: absolute; opacity: 0;
+    width: 100%; height: 100%; cursor: pointer; margin: 0;
+  }
+  .color-option.selected { border-color: #fff; transform: scale(1.1); }
+
+  .vis-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .vis-option { position: relative; }
+  .vis-option input[type="radio"] { position: absolute; opacity: 0; }
+
+  .vis-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.8rem 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .vis-option input:checked + .vis-label {
+    border-color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .vis-label .vis-title { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .vis-label .vis-desc  { font-size: 0.7rem; color: var(--text-dim); }
+
+  .alert-error {
+    background: rgba(255,77,106,0.08);
+    border: 1px solid rgba(255,77,106,0.2);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--red);
+    margin-bottom: 1.2rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 1.6rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    justify-content: space-between;
+  }
+
+  .form-actions-left { display: flex; gap: 0.7rem; }
+
+  .btn-primary {
+    background: var(--violet);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 0.65rem 1.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--sans);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.65rem 1.3rem;
+    font-size: 0.85rem;
+    font-family: var(--sans);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: border-color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid rgba(255,77,106,0.3);
+    border-radius: 9px;
+    padding: 0.65rem 1.3rem;
+    font-size: 0.85rem;
+    font-family: var(--sans);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-danger:hover { background: var(--red-dim); }
+</style>
+
+<a href="/dashboard/projects/<%= project.id %>" class="back-link">← <%= project.name %></a>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert-error"><%= error %></div>
+<% } %>
+
+<%
+  const colors = ['#7c5cfc','#00e5b0','#f5c542','#ff4d6a','#3b82f6','#f97316','#a855f7','#ec4899','#64748b'];
+%>
+
+<div class="form-card">
+  <form action="/dashboard/projects/<%= project.id %>/edit" method="POST">
+
+    <div class="form-group">
+      <label for="name">Project name <span style="color:var(--red)">*</span></label>
+      <input type="text" id="name" name="name"
+        value="<%= project.name %>" required />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description <span class="label-hint">optional</span></label>
+      <textarea id="description" name="description"><%= project.description || '' %></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Color <span class="label-hint">optional</span></label>
+      <div class="color-grid" id="colorGrid">
+        <% colors.forEach((c) => { %>
+          <div class="color-option <%= project.color === c ? 'selected' : '' %>"
+               style="background:<%= c %>"
+               onclick="selectColor(this, '<%= c %>')">
+            <input type="radio" name="color" value="<%= c %>"
+              <%= project.color === c ? 'checked' : '' %> />
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Visibility</label>
+      <div class="vis-options">
+        <div class="vis-option">
+          <input type="radio" name="visibility" id="vis-private" value="private"
+            <%= project.visibility === 'private' ? 'checked' : '' %> />
+          <label class="vis-label" for="vis-private">
+            <span class="vis-title">🔒 Private</span>
+            <span class="vis-desc">Only workspace members</span>
+          </label>
+        </div>
+        <div class="vis-option">
+          <input type="radio" name="visibility" id="vis-public" value="public"
+            <%= project.visibility === 'public' ? 'checked' : '' %> />
+          <label class="vis-label" for="vis-public">
+            <span class="vis-title">🌐 Public</span>
+            <span class="vis-desc">Visible to everyone</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="active"    <%= project.status === 'active'    ? 'selected' : '' %>>Active</option>
+        <option value="archived"  <%= project.status === 'archived'  ? 'selected' : '' %>>Archived</option>
+        <option value="completed" <%= project.status === 'completed' ? 'selected' : '' %>>Completed</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <div class="form-actions-left">
+        <button type="submit" class="btn-primary">Save changes</button>
+        <a href="/dashboard/projects/<%= project.id %>" class="btn-ghost">Cancel</a>
+      </div>
+      <form action="/dashboard/projects/<%= project.id %>/delete" method="POST"
+            onsubmit="return confirm('Delete <%= project.name %>? This cannot be undone.')">
+        <button type="submit" class="btn-danger">Delete project</button>
+      </form>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  function selectColor(el, color) {
+    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+  }
+</script>

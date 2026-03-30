@@ -1,0 +1,439 @@
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+  }
+
+  .stat-value.cyan   { color: var(--cyan); }
+  .stat-value.violet { color: var(--violet); }
+  .stat-value.red    { color: var(--red); }
+  .stat-value.white  { color: #fff; }
+
+  .stat-sub { font-size: 0.7rem; color: var(--text-dim); }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.6rem;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--cyan);
+    transition: width 0.6s ease;
+  }
+
+  /* CHART PANEL */
+  .chart-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+    animation: fadeUp 0.4s 0.1s ease both;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title { font-size: 0.85rem; font-weight: 600; color: #fff; }
+  .panel-sub   { font-size: 0.72rem; color: var(--text-dim); }
+  .panel-body  { padding: 1.2rem; }
+
+  /* BAR CHART */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    height: 140px;
+  }
+
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: opacity 0.2s;
+    position: relative;
+  }
+
+  .bar:hover { opacity: 0.75; }
+  .bar.violet-bar { background: var(--violet); }
+  .bar.cyan-bar   { background: var(--cyan); }
+
+  .bar-label {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .bar-value {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-bottom: 0.2rem;
+  }
+
+  /* TWO COL */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  /* BREAKDOWN ROWS */
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    gap: 0.8rem;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+
+  .breakdown-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .breakdown-name {
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .breakdown-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 80px;
+  }
+
+  .breakdown-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .breakdown-count {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    min-width: 20px;
+    text-align: right;
+  }
+
+  /* DONUT */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .donut {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .donut-inner {
+    position: absolute;
+    inset: 14px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .donut-pct {
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--cyan);
+    line-height: 1;
+  }
+
+  .donut-pct-label {
+    font-size: 0.5rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex: 1;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .legend-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-val {
+    color: var(--text);
+    font-weight: 600;
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+
+  /* PRIORITY COLORS */
+  .p-urgent { background: var(--red); }
+  .p-high   { background: #f97316; }
+  .p-medium { background: var(--violet); }
+  .p-low    { background: var(--text-dim); }
+</style>
+
+<%
+  // ── Status counts (fix: 'todo' în loc de 'open') ─────────────────
+  const totalTasks      = tasks.length;
+  const doneTasks       = tasks.filter(t => t.status === 'done').length;
+  const inProgressTasks = tasks.filter(t => t.status === 'in_progress').length;
+  const todoTasks       = tasks.filter(t => t.status === 'todo').length;
+  const cancelledTasks  = tasks.filter(t => t.status === 'cancelled').length;
+  const completionRate  = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+  // ── Tasks per project (date reale) ───────────────────────────────
+  const tasksByProject = projects.map(p => ({
+    name:  p.name,
+    count: tasks.filter(t => t.projectId === p.id || t.project_id === p.id).length,
+    id:    p.id,
+  })).sort((a, b) => b.count - a.count);
+
+  const maxProjectTasks = Math.max(...tasksByProject.map(p => p.count), 1);
+
+  // ── Priority breakdown ───────────────────────────────────────────
+  const priorities = [
+    { key: 'urgent', label: 'Urgent', cls: 'p-urgent', color: 'var(--red)' },
+    { key: 'high',   label: 'High',   cls: 'p-high',   color: '#f97316' },
+    { key: 'medium', label: 'Medium', cls: 'p-medium',  color: 'var(--violet)' },
+    { key: 'low',    label: 'Low',    cls: 'p-low',     color: 'var(--text-dim)' },
+  ].map(p => ({ ...p, count: tasks.filter(t => t.priority === p.key).length }));
+
+  const maxPriority = Math.max(...priorities.map(p => p.count), 1);
+
+  // ── Donut degrees ────────────────────────────────────────────────
+  const d = (n) => totalTasks > 0 ? Math.round((n / totalTasks) * 360) : 0;
+  const degDone   = d(doneTasks);
+  const degProg   = d(inProgressTasks);
+  const degTodo   = d(todoTasks);
+  // cancelled takes the rest
+%>
+
+<!-- STATS ROW -->
+<div class="analytics-grid">
+  <div class="stat-card" style="animation-delay:0s">
+    <div class="stat-label">Total tasks</div>
+    <div class="stat-value violet"><%= totalTasks %></div>
+    <div class="stat-sub">across <%= projects.length %> project<%= projects.length !== 1 ? 's' : '' %></div>
+  </div>
+  <div class="stat-card" style="animation-delay:0.05s">
+    <div class="stat-label">Completed</div>
+    <div class="stat-value cyan"><%= doneTasks %></div>
+    <div class="stat-sub"><%= completionRate %>% completion rate</div>
+    <div class="progress-wrap">
+      <div class="progress-fill" style="width:<%= completionRate %>%"></div>
+    </div>
+  </div>
+  <div class="stat-card" style="animation-delay:0.1s">
+    <div class="stat-label">In progress</div>
+    <div class="stat-value white"><%= inProgressTasks %></div>
+    <div class="stat-sub">active right now</div>
+  </div>
+  <div class="stat-card" style="animation-delay:0.15s">
+    <div class="stat-label">To do</div>
+    <div class="stat-value red"><%= todoTasks %></div>
+    <div class="stat-sub"><%= cancelledTasks %> cancelled</div>
+  </div>
+</div>
+
+<!-- BAR CHART — tasks per project (date reale) -->
+<div class="chart-panel">
+  <div class="panel-header">
+    <span class="panel-title">Tasks per project</span>
+    <span class="panel-sub"><%= totalTasks %> total</span>
+  </div>
+  <div class="panel-body">
+    <% if (tasksByProject.length === 0) { %>
+      <div class="empty-state">No projects yet.</div>
+    <% } else { %>
+      <div class="bar-chart">
+        <% tasksByProject.forEach(p => {
+          const h = Math.round((p.count / maxProjectTasks) * 100);
+        %>
+          <div class="bar-col">
+            <% if (p.count > 0) { %>
+              <div class="bar-value"><%= p.count %></div>
+            <% } %>
+            <div class="bar violet-bar" style="height:<%= Math.max(h, 3) %>%" title="<%= p.name %>: <%= p.count %> tasks"></div>
+            <div class="bar-label"><%= p.name.length > 8 ? p.name.slice(0,7) + '…' : p.name %></div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- TWO COL -->
+<div class="two-col">
+
+  <!-- Priority breakdown -->
+  <div class="chart-panel" style="margin-bottom:0">
+    <div class="panel-header">
+      <span class="panel-title">Priority breakdown</span>
+    </div>
+    <div class="panel-body">
+      <% if (totalTasks === 0) { %>
+        <div class="empty-state">No tasks yet.</div>
+      <% } else { %>
+        <% priorities.forEach(p => { %>
+          <div class="breakdown-row">
+            <div class="breakdown-dot" style="background:<%= p.color %>"></div>
+            <div class="breakdown-name"><%= p.label %></div>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar-fill" style="width:<%= Math.round((p.count/maxPriority)*100) %>%;background:<%= p.color %>"></div>
+            </div>
+            <div class="breakdown-count"><%= p.count %></div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Status breakdown (donut fix) -->
+  <div class="chart-panel" style="margin-bottom:0">
+    <div class="panel-header">
+      <span class="panel-title">Status breakdown</span>
+    </div>
+    <div class="panel-body">
+      <% if (totalTasks === 0) { %>
+        <div class="empty-state">No tasks yet.</div>
+      <% } else { %>
+        <div class="donut-wrap">
+          <div class="donut" style="background: conic-gradient(
+            var(--cyan)      0deg <%= degDone %>deg,
+            #f97316          <%= degDone %>deg <%= degDone + degProg %>deg,
+            var(--violet)    <%= degDone + degProg %>deg <%= degDone + degProg + degTodo %>deg,
+            var(--text-dim)  <%= degDone + degProg + degTodo %>deg 360deg
+          )">
+            <div class="donut-inner">
+              <span class="donut-pct"><%= completionRate %>%</span>
+              <span class="donut-pct-label">done</span>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--cyan)"></div>
+              Done
+              <span class="legend-val"><%= doneTasks %></span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#f97316"></div>
+              In progress
+              <span class="legend-val"><%= inProgressTasks %></span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--violet)"></div>
+              To do
+              <span class="legend-val"><%= todoTasks %></span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--text-dim)"></div>
+              Cancelled
+              <span class="legend-val"><%= cancelledTasks %></span>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof title !== 'undefined' ? title + ' — Staark' : 'Dashboard — Staark' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0b0b0e;
+      --surface:     #111116;
+      --surface2:    #18181f;
+      --surface3:    #1f1f29;
+      --border:      #1e1e2a;
+      --border2:     #2a2a3a;
+      --text:        #e4e4f0;
+      --text-dim:    #5c5c7a;
+      --text-mid:    #9090b0;
+      --violet:      #7c5cfc;
+      --violet-dim:  rgba(124,92,252,0.12);
+      --violet-glow: rgba(124,92,252,0.25);
+      --cyan:        #00e5b0;
+      --cyan-dim:    rgba(0,229,176,0.10);
+      --red:         #ff4d6a;
+      --red-dim:     rgba(255,77,106,0.10);
+      --orange:      #f97316;
+      --yellow:      #f5c542;
+      --sidebar-w:   220px;
+      --sans:    'Inter', sans-serif;
+      --display: 'Bricolage Grotesque', sans-serif;
+      --mono:    'Courier New', monospace;
+      --radius:  10px;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SHELL ── */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* subtle dot grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1.15rem 1.1rem;
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 26px; height: 26px;
+      background: linear-gradient(135deg, var(--violet), #a78bfa);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px var(--violet-glow);
+    }
+
+    .logo-icon svg { width: 12px; height: 12px; fill: #fff; }
+
+    .wordmark {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #fff;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 0.8rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .nav-section-label {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-dim);
+      padding: 0.7rem 0.7rem 0.3rem;
+      margin-top: 0.3rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.5rem 0.7rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      transition: background 0.12s, color 0.12s;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--surface2);
+      color: var(--text-mid);
+    }
+
+    .nav-item.active {
+      background: var(--violet-dim);
+      color: #fff;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 6px; bottom: 6px;
+      width: 2px;
+      background: var(--violet);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .nav-item .icon {
+      width: 15px; height: 15px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .nav-item.active .icon { opacity: 1; }
+    .nav-item:hover .icon  { opacity: 0.9; }
+
+    /* USER BOTTOM */
+    .sidebar-user {
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--violet-dim);
+      border: 1px solid rgba(124,92,252,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--violet);
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .user-name  { font-size: 0.75rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .logout-form { display: inline; flex-shrink: 0; }
+
+    .logout-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim); padding: 0.3rem;
+      border-radius: 5px; transition: color 0.15s;
+      display: flex; align-items: center;
+    }
+    .logout-btn:hover { color: var(--red); }
+
+    /* ── MAIN ── */
+    .main { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.6rem;
+      height: 54px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      gap: 1rem;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+
+    .topbar-title {
+      font-family: var(--display);
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .topbar-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      min-width: 0;
+    }
+
+    .topbar-breadcrumb a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; white-space: nowrap; }
+    .topbar-breadcrumb a:hover { color: var(--text); }
+    .topbar-breadcrumb .sep { color: var(--border2); }
+    .topbar-breadcrumb .current { color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+
+    /* BUTTONS */
+    .btn-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.38rem 0.8rem;
+      border-radius: 7px;
+      font-size: 0.77rem;
+      font-weight: 600;
+      font-family: var(--sans);
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      border: none;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    .btn-sm.primary { background: var(--violet); color: #fff; }
+    .btn-sm.primary:hover { opacity: 0.85; }
+    .btn-sm.ghost { background: transparent; color: var(--text-mid); border: 1px solid var(--border2); }
+    .btn-sm.ghost:hover { border-color: var(--text-dim); color: var(--text); }
+    .btn-sm.danger { background: transparent; color: var(--red); border: 1px solid rgba(255,77,106,0.25); }
+    .btn-sm.danger:hover { background: var(--red-dim); border-color: var(--red); }
+
+    /* CONTENT AREA */
+    .content { flex: 1; overflow-y: auto; padding: 1.5rem 1.8rem; }
+
+    /* ── GLOBAL CONFIRM MODAL ── */
+    .g-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .g-modal-overlay.show { display: flex; }
+
+    .g-modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 1.8rem;
+      max-width: 380px;
+      width: 92%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: modalIn 0.2s ease both;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .g-modal-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--red-dim);
+      border: 1px solid rgba(255,77,106,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    .g-modal-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 0.45rem;
+    }
+
+    .g-modal-name {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--red);
+      text-align: center;
+      margin-bottom: 0.6rem;
+      word-break: break-word;
+    }
+
+    .g-modal-body {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      text-align: center;
+      line-height: 1.55;
+      margin-bottom: 1.4rem;
+    }
+
+    .g-modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+    }
+
+    .g-modal-actions .btn-sm { min-width: 90px; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a class="sidebar-logo" href="/dashboard">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <span class="wordmark">Staark</span>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="/dashboard" class="nav-item <%= currentPage === 'dashboard' ? 'active' : '' %>">
+        <span class="icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </span>
+        Dashboard
+      </a>
+
+      <div class="nav-section-label">Workspace</div>
+      <a href="/dashboard/projects" class="nav-item <%= currentPage === 'projects' ? 'active' : '' %>">
+        <span class="icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+        </span>
+        Projects & Tasks
+      </a>
+      <a href="/dashboard/keys" class="nav-item <%= currentPage === 'keys' ? 'active' : '' %>">
+        <span class="icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="7.5" cy="15.5" r="5.5"/>
+            <path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/>
+          </svg>
+        </span>
+        API Keys
+      </a>
+      <a href="/dashboard/analytics" class="nav-item <%= currentPage === 'analytics' ? 'active' : '' %>">
+        <span class="icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </span>
+        Analytics
+      </a>
+
+      <div class="nav-section-label">Links</div>
+      <a href="https://staark-app.cloud" target="_blank" class="nav-item">
+        <span class="icon">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </span>
+        Main site
+      </a>
+      <a href="https://api.staark-app.cloud" target="_blank" class="nav-item">
+        <span class="icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </span>
+        Docs
+      </a>
+      <a href="https://api.staark-app.cloud/status" target="_blank" class="nav-item">
+        <span class="icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </span>
+        Status
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-info">
+        <div class="user-avatar">
+          <%= typeof user !== 'undefined' ? (user.firstName?.[0] || '') + (user.lastName?.[0] || '') : 'U' %>
+        </div>
+        <div style="min-width:0">
+          <div class="user-name"><%= typeof user !== 'undefined' ? (user.firstName + ' ' + user.lastName).trim() || user.email : 'User' %></div>
+          <div class="user-email"><%= typeof user !== 'undefined' ? user.email : '' %></div>
+        </div>
+      </div>
+      <form action="/logout" method="POST" class="logout-form">
+        <button type="submit" class="logout-btn" title="Sign out">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <% if (typeof breadcrumb !== 'undefined' && breadcrumb) { %>
+          <div class="topbar-breadcrumb">
+            <%- breadcrumb %>
+          </div>
+        <% } else { %>
+          <div class="topbar-title"><%= typeof title !== 'undefined' ? title : 'Dashboard' %></div>
+        <% } %>
+      </div>
+      <div class="topbar-actions">
+        <%- typeof topbarActions !== 'undefined' ? topbarActions : '' %>
+      </div>
+    </div>
+    <div class="content">
+      <%- body %>
+    </div>
+  </div>
+
+</div>
+
+<!-- GLOBAL CONFIRM MODAL -->
+<div class="g-modal-overlay" id="gConfirmModal">
+  <div class="g-modal-box">
+    <div class="g-modal-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </div>
+    <div class="g-modal-title" id="gConfirmTitle">Confirm Delete</div>
+    <div class="g-modal-name" id="gConfirmName"></div>
+    <div class="g-modal-body" id="gConfirmBody">This action cannot be undone.</div>
+    <div class="g-modal-actions">
+      <button class="btn-sm ghost" onclick="closeGConfirm()">Cancel</button>
+      <form id="gConfirmForm" method="POST" style="margin:0">
+        <button type="submit" class="btn-sm danger">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openConfirm(action, name, body) {
+    document.getElementById('gConfirmForm').action = action;
+    document.getElementById('gConfirmName').textContent = name || '';
+    document.getElementById('gConfirmBody').textContent = body || 'This action cannot be undone.';
+    document.getElementById('gConfirmModal').classList.add('show');
+  }
+
+  function closeGConfirm() {
+    document.getElementById('gConfirmModal').classList.remove('show');
+  }
+
+  document.getElementById('gConfirmModal').addEventListener('click', function(e) {
+    if (e.target === this) closeGConfirm();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeGConfirm();
+  });
+</script>
+
+</body>
+</html>

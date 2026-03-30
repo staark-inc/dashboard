@@ -1,0 +1,583 @@
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* TOOLBAR */
+  .projects-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  .toolbar-left { display: flex; align-items: center; gap: 0.5rem; }
+
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 0.65rem;
+    color: var(--text-dim);
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem 0.4rem 2.1rem;
+    font-size: 0.8rem;
+    color: var(--text);
+    font-family: var(--sans);
+    outline: none;
+    width: 200px;
+    transition: border-color 0.2s, width 0.25s;
+  }
+
+  .search-input:focus { border-color: var(--violet); width: 240px; }
+  .search-input::placeholder { color: var(--text-dim); }
+
+  /* GRID */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.35s 0.05s ease both;
+  }
+
+  /* PROJECT CARD */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-color, var(--violet));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .project-card:hover {
+    border-color: var(--border2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .project-card:hover::before { opacity: 1; }
+
+  .project-card:hover .card-actions { opacity: 1; }
+
+  .card-body {
+    padding: 1.1rem 1.1rem 0.8rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .card-color-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .card-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+
+  .card-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    cursor: pointer;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: all 0.12s;
+  }
+
+  .card-action-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--text-dim); }
+  .card-action-btn.del:hover { background: var(--red-dim); color: var(--red); border-color: rgba(255,77,106,0.35); }
+
+  .card-desc {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* PROGRESS */
+  .card-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1.1rem 0.8rem;
+  }
+
+  .card-prog-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .card-prog-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--cyan);
+    transition: width 0.5s ease;
+  }
+
+  .card-prog-pct {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    min-width: 28px;
+    text-align: right;
+  }
+
+  /* FOOTER */
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1.1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    gap: 0.5rem;
+  }
+
+  .vis-badge {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.38rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .vis-badge.public  { background: var(--cyan-dim);   color: var(--cyan);   border: 1px solid rgba(0,229,176,0.2); }
+  .vis-badge.private { background: var(--violet-dim); color: var(--violet); border: 1px solid rgba(124,92,252,0.2); }
+
+  .status-badge {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.38rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .status-badge.active    { background: var(--cyan-dim);  color: var(--cyan);  border: 1px solid rgba(0,229,176,0.2); }
+  .status-badge.archived  { background: transparent;      color: var(--text-dim); border: 1px solid var(--border); }
+  .status-badge.completed { background: rgba(245,197,66,0.1); color: var(--yellow); border: 1px solid rgba(245,197,66,0.2); }
+
+  /* NEW PROJECT CARD */
+  .new-project-card {
+    background: transparent;
+    border: 1px dashed var(--border2);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 130px;
+    text-decoration: none;
+    padding: 1.3rem;
+  }
+
+  .new-project-card:hover {
+    border-color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .new-project-card .new-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  .new-project-card:hover .new-icon {
+    background: var(--violet-dim);
+    border-color: rgba(124,92,252,0.3);
+    color: var(--violet);
+  }
+
+  .new-project-card .new-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: color 0.2s;
+  }
+
+  .new-project-card:hover .new-label { color: var(--violet); }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.2rem 0 1rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+
+  .section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* TASKS PANEL */
+  .tasks-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    animation: fadeUp 0.35s 0.1s ease both;
+  }
+
+  .tasks-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    gap: 0.8rem;
+  }
+
+  .panel-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .project-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.32rem 0.7rem;
+    font-size: 0.75rem;
+    color: var(--text);
+    font-family: var(--sans);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .project-select:focus { border-color: var(--violet); }
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 8px 1fr auto auto auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    transition: background 0.12s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .task-row:last-child { border-bottom: none; }
+  .task-row:hover { background: var(--surface2); }
+
+  .task-row.header {
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+  }
+
+  .priority-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .priority-dot.urgent { background: var(--red); }
+  .priority-dot.high   { background: var(--orange); }
+  .priority-dot.medium { background: var(--violet); }
+  .priority-dot.low    { background: var(--text-dim); }
+
+  .task-title { font-weight: 500; color: var(--text); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .task-status {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    padding: 0.12rem 0.42rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border: 1px solid;
+  }
+
+  .task-status.todo        { color: var(--text-dim); background: transparent;           border-color: var(--border2); }
+  .task-status.in_progress { color: var(--yellow);   background: rgba(245,197,66,0.1);  border-color: rgba(245,197,66,0.2); }
+  .task-status.done        { color: var(--cyan);     background: var(--cyan-dim);       border-color: rgba(0,229,176,0.2); }
+  .task-status.cancelled   { color: var(--red);      background: var(--red-dim);        border-color: rgba(255,77,106,0.2); }
+
+  .task-due {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .task-due.overdue { color: var(--red); }
+
+  .empty-state {
+    padding: 2.5rem 1.2rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .empty-state a { color: var(--violet); text-decoration: none; }
+</style>
+
+<!-- TOOLBAR -->
+<div class="projects-toolbar">
+  <div class="toolbar-left">
+    <div class="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" class="search-input" id="projectSearch" placeholder="Filter projects..." oninput="filterProjects(this.value)" />
+    </div>
+  </div>
+  <a href="/dashboard/projects/new" class="btn-sm primary">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New project
+  </a>
+</div>
+
+<!-- PROJECT CARDS -->
+<div class="projects-grid" id="projectsGrid">
+  <% projects.forEach((p, i) => {
+    const taskCount = p.taskCount ?? 0;
+    const doneCount = p.doneCount ?? 0;
+    const pct = taskCount > 0 ? Math.round((doneCount / taskCount) * 100) : 0;
+  %>
+    <div class="project-card" style="--card-color:<%= p.color || 'var(--violet)' %>; animation-delay:<%= i * 0.04 %>s"
+         onclick="window.location='/dashboard/projects/<%= p.id %>'"
+         data-name="<%= p.name.toLowerCase() %>">
+
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-color-bar">
+            <div class="card-dot" style="background:<%= p.color || 'var(--violet)' %>"></div>
+            <div class="card-name"><%= p.name %></div>
+          </div>
+          <div class="card-actions">
+            <a href="/dashboard/projects/<%= p.id %>/edit"
+               class="card-action-btn" title="Edit project"
+               onclick="event.stopPropagation()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </a>
+            <button class="card-action-btn del" title="Delete project"
+                    onclick="event.stopPropagation(); openConfirm('/dashboard/projects/<%= p.id %>/delete', '<%= p.name.replace(/'/g, `\\'`) %>', 'All tasks in this project will be permanently deleted.')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <% if (p.description) { %>
+          <div class="card-desc"><%= p.description %></div>
+        <% } %>
+      </div>
+
+      <% if (taskCount > 0) { %>
+        <div class="card-progress">
+          <div class="card-prog-bar">
+            <div class="card-prog-fill" style="width:<%= pct %>%"></div>
+          </div>
+          <span class="card-prog-pct"><%= pct %>%</span>
+        </div>
+      <% } %>
+
+      <div class="card-footer">
+        <span><%= taskCount %> task<%= taskCount !== 1 ? 's' : '' %></span>
+        <span><%= new Date(p.createdAt || p.created_at * 1000 || Date.now()).toLocaleDateString('en-GB') %></span>
+        <div style="display:flex;gap:0.3rem">
+          <span class="vis-badge <%= p.visibility || 'private' %>"><%= p.visibility || 'private' %></span>
+          <span class="status-badge <%= p.status || 'active' %>"><%= p.status || 'active' %></span>
+        </div>
+      </div>
+
+    </div>
+  <% }) %>
+
+  <a href="/dashboard/projects/new" class="new-project-card" id="newProjectCard">
+    <div class="new-icon">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </div>
+    <span class="new-label">New project</span>
+  </a>
+</div>
+
+<% if (projects.length > 0) { %>
+
+<!-- TASKS -->
+<div class="section-divider">Tasks</div>
+
+<div class="tasks-panel">
+  <div class="tasks-panel-header">
+    <span class="panel-title">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Tasks
+      <% if (selectedProjectId) { %>
+        <span style="font-weight:400;color:var(--text-dim);font-size:0.75rem">in <%= projects.find(p => p.id == selectedProjectId)?.name || 'project' %></span>
+      <% } %>
+    </span>
+    <div style="display:flex;align-items:center;gap:0.5rem">
+      <select class="project-select" onchange="window.location='/dashboard/projects?project='+this.value">
+        <% projects.forEach(p => { %>
+          <option value="<%= p.id %>" <%= selectedProjectId == p.id ? 'selected' : '' %>><%= p.name %></option>
+        <% }) %>
+      </select>
+      <% if (selectedProjectId) { %>
+        <a href="/dashboard/projects/<%= selectedProjectId %>/tasks/new" class="btn-sm primary" style="padding:0.32rem 0.65rem">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add task
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (!tasks || tasks.length === 0) { %>
+    <div class="empty-state">
+      No tasks yet.
+      <% if (selectedProjectId) { %>
+        <a href="/dashboard/projects/<%= selectedProjectId %>/tasks/new">Add the first task →</a>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="task-row header">
+      <span></span><span>Title</span><span>Status</span><span>Due</span><span></span>
+    </div>
+    <% tasks.slice(0, 15).forEach(t => { %>
+      <div class="task-row" onclick="window.location='/dashboard/projects/<%= selectedProjectId %>/tasks/<%= t.id %>/edit'">
+        <span class="priority-dot <%= t.priority || 'medium' %>"></span>
+        <span class="task-title"><%= t.title %></span>
+        <span class="task-status <%= t.status || 'todo' %>"><%= (t.status || 'todo').replace('_', ' ') %></span>
+        <span class="task-due <%= t.due_date && new Date(t.due_date) < new Date() && t.status !== 'done' ? 'overdue' : '' %>">
+          <%= t.due_date ? new Date(t.due_date).toLocaleDateString('en-GB') : '—' %>
+        </span>
+        <a href="/dashboard/projects/<%= selectedProjectId %>/tasks/<%= t.id %>/edit"
+           class="btn-sm ghost" style="padding:0.25rem 0.5rem;font-size:0.68rem"
+           onclick="event.stopPropagation()">Edit</a>
+      </div>
+    <% }) %>
+    <% if (tasks.length > 15) { %>
+      <div style="padding:0.65rem 1.1rem;text-align:center;font-size:0.72rem;color:var(--text-dim);border-top:1px solid var(--border)">
+        <a href="/dashboard/projects/<%= selectedProjectId %>" style="color:var(--violet);text-decoration:none">View all <%= tasks.length %> tasks →</a>
+      </div>
+    <% } %>
+  <% } %>
+</div>
+
+<% } %>
+
+<script>
+  function filterProjects(val) {
+    const q = val.toLowerCase().trim();
+    document.querySelectorAll('#projectsGrid .project-card').forEach(card => {
+      const name = card.dataset.name || '';
+      card.style.display = name.includes(q) ? '' : 'none';
+    });
+    document.getElementById('newProjectCard').style.display = q ? 'none' : '';
+  }
+</script>

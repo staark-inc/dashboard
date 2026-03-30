@@ -1,0 +1,403 @@
+<style>
+  /* ── KEYFRAMES ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    margin-bottom: 2.8rem;
+    animation: fadeUp 0.55s ease both;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+    margin-bottom: 1.2rem;
+    opacity: 0.85;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.8rem;
+  }
+
+  .hero h1 .cyan  { color: var(--cyan); }
+  .hero h1 .violet { color: var(--violet); }
+
+  .hero-sub {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    max-width: 420px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── OVERALL STATUS BANNER ── */
+  .status-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0 auto 3rem;
+    max-width: fit-content;
+    border: 1px solid;
+    animation: fadeUp 0.55s 0.1s ease both;
+  }
+
+  .status-banner.ok {
+    background: rgba(0,229,176,0.07);
+    border-color: rgba(0,229,176,0.2);
+    color: var(--cyan);
+  }
+
+  .status-banner.degraded {
+    background: rgba(255,77,106,0.07);
+    border-color: rgba(255,77,106,0.2);
+    color: var(--red);
+  }
+
+  .status-banner .blink-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: blink 2.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── SERVICE LIST ── */
+  .services {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-bottom: 3.5rem;
+  }
+
+  .svc-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 1.3rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.2s, background 0.2s;
+    animation: fadeUp 0.45s ease both;
+  }
+
+  .svc-card:hover {
+    background: var(--surface2);
+    border-color: #2e2e45;
+  }
+
+  .svc-card.is-down {
+    border-color: rgba(255,77,106,0.22);
+    background: rgba(255,77,106,0.04);
+  }
+
+  .svc-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .svc-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .svc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  .svc-meta .target { color: var(--violet); opacity: 0.85; }
+
+  .svc-error {
+    font-family: var(--mono);
+    font-size: 0.63rem;
+    color: var(--red);
+    opacity: 0.75;
+    margin-top: 0.1rem;
+  }
+
+  .svc-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  /* ── STATUS PILL ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    border: 1px solid;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill .pip {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .pill.operational {
+    color: var(--cyan);
+    background: var(--cyan-dim);
+    border-color: rgba(0,229,176,0.2);
+  }
+
+  .pill.down {
+    color: var(--red);
+    background: var(--red-dim);
+    border-color: rgba(255,77,106,0.2);
+  }
+
+  .pill.degraded {
+    color: var(--yellow);
+    background: rgba(245,197,66,0.1);
+    border-color: rgba(245,197,66,0.2);
+  }
+
+  /* ── UPTIME BAR ── */
+  .uptime-row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--text-dim);
+  }
+
+  .uptime-track {
+    width: 72px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .uptime-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .uptime-fill.high   { background: var(--cyan); }
+  .uptime-fill.medium { background: var(--yellow); }
+  .uptime-fill.low    { background: var(--red); }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.8rem;
+    animation: fadeUp 0.55s 0.15s ease both;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .stat-value.cyan   { color: var(--cyan); }
+  .stat-value.violet { color: var(--violet); }
+  .stat-value.white  { color: #fff; }
+
+  .stat-sub {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-top: 0.1rem;
+  }
+</style>
+
+<%
+  const allOk = status.every(s => s.status === 'Operational');
+  const operationalCount = status.filter(s => s.status === 'Operational').length;
+  const validLatencies = status.filter(s => s.latencyMs != null && s.latencyMs > 0);
+  const avgLatency = validLatencies.length
+    ? Math.round(validLatencies.reduce((a,b) => a + b.latencyMs, 0) / validLatencies.length)
+    : 0;
+  const formatted = new Date(generatedAt).toLocaleString('en-GB', {
+    dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC'
+  });
+
+  function pillClass(s) {
+    if (s === 'Operational') return 'operational';
+    if (s === 'Down')        return 'down';
+    return 'degraded';
+  }
+
+  function uptimeFill(pct) {
+    if (pct >= 95) return 'high';
+    if (pct >= 50) return 'medium';
+    return 'low';
+  }
+%>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span>◎</span> System Status
+  </div>
+  <h1>
+    <%= allOk ? 'All systems' : 'Service' %><br/>
+    <span class="<%= allOk ? 'cyan' : 'violet' %>">
+      <%= allOk ? 'operational.' : 'disruption.' %>
+    </span>
+  </h1>
+  <p class="hero-sub">
+    Real-time health monitoring for Staark infrastructure.
+  </p>
+</div>
+
+<!-- BANNER -->
+<div class="status-banner <%= allOk ? 'ok' : 'degraded' %>">
+  <span class="blink-dot"></span>
+  <%= allOk
+    ? 'All ' + status.length + ' services operational'
+    : operationalCount + ' / ' + status.length + ' services operational' %>
+</div>
+
+<!-- SERVICES -->
+<div class="section-label">Services</div>
+<div class="services">
+  <% status.forEach((item, i) => { %>
+    <div class="svc-card <%= item.status === 'Down' ? 'is-down' : '' %>"
+         style="animation-delay:<%= i * 0.05 %>s">
+      <div class="svc-left">
+        <div class="svc-name"><%= item.name %></div>
+        <div class="svc-meta">
+          <span class="target"><%= item.target %></span>
+          <% if (item.latencyMs != null) { %>
+            <span><%= item.latencyMs %>ms</span>
+          <% } %>
+          <% if (item.httpStatus) { %>
+            <span>HTTP <%= item.httpStatus %></span>
+          <% } %>
+        </div>
+        <% if (item.error) { %>
+          <div class="svc-error">⚠ <%= item.error %></div>
+        <% } %>
+      </div>
+
+      <div class="svc-right">
+        <div class="pill <%= pillClass(item.status) %>">
+          <span class="pip"></span>
+          <%= item.status %>
+        </div>
+        <div class="uptime-row">
+          <div class="uptime-track">
+            <div class="uptime-fill <%= uptimeFill(item.uptimePercent) %>"
+                 style="width:<%= item.uptimePercent %>%"></div>
+          </div>
+          <%= item.uptimePercent %>%
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<!-- STATS -->
+<div class="section-label">Snapshot</div>
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Services monitored</div>
+    <div class="stat-value violet"><%= status.length %></div>
+    <div class="stat-sub">total endpoints</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Operational</div>
+    <div class="stat-value cyan"><%= operationalCount %><span style="font-size:1rem;color:var(--text-dim)"> / <%= status.length %></span></div>
+    <div class="stat-sub">services healthy</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Avg. latency</div>
+    <div class="stat-value white"><%= avgLatency %><span style="font-size:1rem;color:var(--text-dim)">ms</span></div>
+    <div class="stat-sub">across all services</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Last checked</div>
+    <div class="stat-value" style="font-size:0.95rem;color:var(--text);margin-top:0.2rem"><%= formatted %></div>
+    <div class="stat-sub">UTC</div>
+  </div>
+</div>

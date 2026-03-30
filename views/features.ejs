@@ -1,0 +1,358 @@
+<style>
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-hero {
+    text-align: center;
+    padding: 3rem 0 4rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+    margin-bottom: 1.2rem;
+    opacity: 0.85;
+  }
+
+  .page-hero h1 {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .page-hero h1 span { color: var(--violet); }
+
+  .page-hero p {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.65;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--violet);
+    color: #fff;
+    text-decoration: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .hero-cta:hover { opacity: 0.85; }
+
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 5rem;
+  }
+
+  @media (max-width: 700px) {
+    .features-grid { grid-template-columns: 1fr; }
+  }
+
+  .feat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    transition: border-color 0.2s, background 0.2s;
+    animation: fadeUp 0.45s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feat-card:hover {
+    background: var(--surface2);
+    border-color: #2e2e45;
+  }
+
+  /* featured card spans 2 cols with code preview */
+  .feat-card.featured {
+    grid-column: span 2;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .feat-card.featured .feat-content { flex: 1; }
+
+  .feat-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .feat-icon.yellow { background: rgba(245,197,66,0.12); }
+  .feat-icon.violet { background: var(--violet-dim); }
+  .feat-icon.cyan   { background: var(--cyan-dim); }
+  .feat-icon.red    { background: var(--red-dim); }
+  .feat-icon.blue   { background: rgba(59,130,246,0.12); }
+  .feat-icon.green  { background: rgba(34,197,94,0.1); }
+
+  .feat-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .feat-desc {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* code snippet inside featured card */
+  .code-preview {
+    background: #0a0a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    line-height: 1.7;
+    flex-shrink: 0;
+    width: 260px;
+    color: var(--text-dim);
+  }
+
+  .code-preview .kw  { color: #c792ea; }
+  .code-preview .fn  { color: var(--cyan); }
+  .code-preview .st  { color: #c3e88d; }
+  .code-preview .cm  { color: #3d3d55; }
+  .code-preview .num { color: var(--yellow); }
+  .code-preview .ok  { color: var(--cyan); }
+
+  /* STATS STRIP */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 5rem;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .strip-item {
+    background: var(--surface);
+    padding: 1.5rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .strip-val {
+    font-family: var(--display);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .strip-val.cyan   { color: var(--cyan); }
+  .strip-val.violet { color: var(--violet); }
+  .strip-val.white  { color: #fff; }
+  .strip-val.yellow { color: var(--yellow); }
+
+  .strip-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  /* CTA BOTTOM */
+  .cta-section {
+    text-align: center;
+    padding: 3.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    animation: fadeUp 0.5s 0.25s ease both;
+  }
+
+  .cta-section h2 {
+    font-family: var(--display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.7rem;
+  }
+
+  .cta-section p {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin-bottom: 1.8rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--violet);
+    color: #fff;
+    text-decoration: none;
+    padding: 0.65rem 1.3rem;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0.65rem 1.3rem;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s;
+  }
+
+  .btn-ghost:hover { border-color: var(--text-dim); }
+</style>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="eyebrow">◎ What you get</div>
+  <h1>Everything you need<br/><span>to ship.</span></h1>
+  <p>A complete project management layer, exposed as clean REST endpoints your team can build on.</p>
+  <a href="https://admin.staark-app.cloud/register" class="hero-cta">Get API Key — it's free →</a>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="strip-item">
+    <div class="strip-val cyan">32</div>
+    <div class="strip-label">API Endpoints</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-val violet">5k</div>
+    <div class="strip-label">Requests / minute</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-val yellow">99.9%</div>
+    <div class="strip-label">Uptime SLA</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-val white">&lt;40ms</div>
+    <div class="strip-label">Avg. response time</div>
+  </div>
+</div>
+
+<!-- FEATURES GRID -->
+<div class="features-grid">
+
+  <!-- FEATURED — Projects & Tasks -->
+  <div class="feat-card featured" style="animation-delay:0s">
+    <div class="feat-content">
+      <div class="feat-icon yellow">📁</div>
+      <div class="feat-title">Projects &amp; Tasks</div>
+      <div class="feat-desc">Full CRUD for projects, tasks, sprints, and tags. Assign members, set priorities, track due dates — all via API.</div>
+    </div>
+    <div class="code-preview">
+      <span class="cm">POST /v1/tasks ────────── {</span><br/>
+      &nbsp;&nbsp;<span class="st">"title"</span>: <span class="st">"Ship feature"</span>,<br/>
+      &nbsp;&nbsp;<span class="st">"priority"</span>: <span class="st">"urgent"</span>,<br/>
+      &nbsp;&nbsp;<span class="st">"due_date"</span>: <span class="st">"2026-04-01"</span><br/>
+      <span class="cm">}</span><br/>
+      <span class="ok">201 Created</span> · <span class="num">38ms</span>
+    </div>
+  </div>
+
+  <!-- Webhooks -->
+  <div class="feat-card" style="animation-delay:0.05s">
+    <div class="feat-icon yellow">⚡</div>
+    <div class="feat-title">Webhooks</div>
+    <div class="feat-desc">Real-time event delivery for task changes, project updates, and team events. HMAC-signed for security.</div>
+  </div>
+
+  <!-- API Key Auth -->
+  <div class="feat-card" style="animation-delay:0.1s">
+    <div class="feat-icon violet">🔑</div>
+    <div class="feat-title">API Key Auth</div>
+    <div class="feat-desc">Simple Bearer token authentication. Scoped per workspace with granular permission control.</div>
+  </div>
+
+  <!-- Team Management -->
+  <div class="feat-card" style="animation-delay:0.15s">
+    <div class="feat-icon violet">👥</div>
+    <div class="feat-title">Team Management</div>
+    <div class="feat-desc">Invite members, assign roles, manage permissions. Full team lifecycle via REST.</div>
+  </div>
+
+  <!-- Analytics -->
+  <div class="feat-card" style="animation-delay:0.2s">
+    <div class="feat-icon cyan">📊</div>
+    <div class="feat-title">Analytics</div>
+    <div class="feat-desc">Query task completion rates, sprint velocity, and team throughput with built-in aggregation endpoints.</div>
+  </div>
+
+  <!-- Auto Retry -->
+  <div class="feat-card" style="animation-delay:0.25s">
+    <div class="feat-icon blue">🔄</div>
+    <div class="feat-title">Auto Retry</div>
+    <div class="feat-desc">Pro plan includes automatic webhook retries with exponential backoff and a full delivery log.</div>
+  </div>
+
+  <!-- Sprints -->
+  <div class="feat-card" style="animation-delay:0.3s">
+    <div class="feat-icon green">🏃</div>
+    <div class="feat-title">Sprints</div>
+    <div class="feat-desc">Create and manage sprints, move tasks between them, and query velocity metrics over time.</div>
+  </div>
+
+  <!-- SDKs -->
+  <div class="feat-card" style="animation-delay:0.35s">
+    <div class="feat-icon red">📦</div>
+    <div class="feat-title">SDKs</div>
+    <div class="feat-desc">Official Node.js SDK with TypeScript support. More languages coming soon.</div>
+  </div>
+
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Ready to build?</h2>
+  <p>Get your API key in 30 seconds and start shipping project management features today.</p>
+  <div class="cta-buttons">
+    <a href="https://admin.staark-app.cloud/register" class="btn-primary">Get API Key — it's free →</a>
+    <a href="https://docs.staark-app.cloud" class="btn-ghost">Read the docs</a>
+  </div>
+</div>

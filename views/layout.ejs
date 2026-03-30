@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staark — System Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0d0d0f;
+      --surface:     #13131a;
+      --surface2:    #1a1a24;
+      --border:      #232334;
+      --text:        #e2e2f0;
+      --text-dim:    #6b6b8a;
+      --violet:      #7c5cfc;
+      --violet-dim:  rgba(124,92,252,0.15);
+      --cyan:        #00e5b0;
+      --cyan-dim:    rgba(0,229,176,0.12);
+      --red:         #ff4d6a;
+      --red-dim:     rgba(255,77,106,0.1);
+      --yellow:      #f5c542;
+      --mono: 'Courier New', monospace;
+      --sans: 'Inter', sans-serif;
+      --display: 'Bricolage Grotesque', sans-serif;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 62px;
+      background: rgba(13,13,15,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      text-decoration: none;
+    }
+
+    .nav-logo .logo-icon {
+      width: 28px; height: 28px;
+      background: var(--violet);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .nav-logo .logo-icon svg { width: 14px; height: 14px; fill: #fff; }
+
+    .nav-logo .wordmark {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #fff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.6rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--violet) !important;
+      color: #fff !important;
+      padding: 0.42rem 1rem !important;
+      border-radius: 8px;
+      font-weight: 600 !important;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* MAIN */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 1.5rem 6rem;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .footer-logo .logo-icon {
+      width: 20px; height: 20px;
+      background: var(--violet);
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .footer-logo .logo-icon svg { width: 10px; height: 10px; fill: #fff; }
+
+    .footer-logo .wordmark {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 0.78rem;
+      color: #fff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .footer-copy {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.4rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="https://staark-app.cloud">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <span class="wordmark">Staark</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="https://staark-app.cloud/features">Features</a></li>
+      <li><a href="https://staark-app.cloud/pricing">Pricing</a></li>
+      <li><a href="https://api.staark-app.cloud">Docs</a></li>
+      <li><a href="https://api.staark-app.cloud/changelog">Changelog</a></li>
+      <li><a href="https://staark-app.cloud/login">Sign in</a></li>
+      <li><a href="https://staark-app.cloud/register" class="nav-cta">Get API Key →</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <%- body %>
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span class="wordmark">Staark</span>
+      </div>
+      <span class="footer-copy">© 2026 Staark. All rights reserved.</span>
+    </div>
+    <ul class="footer-links">
+      <li><a href="https://docs.staark-app.cloud">API Docs</a></li>
+      <li><a href="https://staark-app.cloud/changelog">Changelog</a></li>
+      <li><a href="#">SDKs</a></li>
+      <li><a href="/status">Status</a></li>
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Terms</a></li>
+    </ul>
+  </footer>
+
+</body>
+</html>
