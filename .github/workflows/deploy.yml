@@ -27,6 +27,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Debug repo structure
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3 -type f | sort
+          
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
