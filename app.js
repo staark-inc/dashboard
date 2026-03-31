@@ -54,6 +54,8 @@ app.use((req, res, next) => {
 
 // EJS Engine Setup
 app.set("view engine", "ejs");
+// După app.set("view engine", "ejs");
+app.set('view cache', process.env.NODE_ENV === 'production');
 app.set("views", path.join(__dirname, "views"));
 app.use(layouts);
 app.set("layout", "layout");
