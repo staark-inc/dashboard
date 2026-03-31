@@ -1,23 +1,19 @@
 # syntax=docker/dockerfile:1.4
-FROM node:20-alpine as base
+FROM node:20-alpine
 
+# Setăm directorul de lucru
 WORKDIR /app
 
+# Copiem doar package.json și package-lock.json pentru a folosi cache eficient
 COPY package*.json ./
-
-# Folosim secret BuildKit, citit din .env
-RUN --mount=type=secret,id=github_token \
-    set -a && \
-    source /run/secrets/github_token && \
-    set +a && \
-    echo "@staark-inc:registry=https://npm.pkg.github.com" > .npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=$GITHUB_PACKAGES_TOKEN" >> .npmrc && \
-    echo "always-auth=true" >> .npmrc && \
-    npm install --omit=dev && \
-    rm -f .npmrc
+RUN --mount=type=secret,id=github_packages_token \
+  set -eux; \
+  TOKEN="$(cat /run/secrets/github_packages_token)"; \
+  test -n "$TOKEN"; \
+  printf "@staark-inc:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > .npmrc; \
+  npm ci --omit=dev; \
+  rm -f .npmrc
 
 COPY . .
-
 EXPOSE 3005
-
 CMD ["npm", "run", "start"]
