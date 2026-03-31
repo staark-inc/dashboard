@@ -172,22 +172,17 @@ if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
   log "✅ Container vechi șters"
 fi
 
-log "▶️  Rulăm containerul nou..."
-docker run -d \
-  --name "$CONTAINER_NAME" \
-  --env-file "$ENV_FILE" \
-  -p "$PORT:$PORT" \
-  "$FULL_IMAGE"
+log "▶️  Deploying cu docker-compose..."
+
+export DASHBOARD_IMAGE="$FULL_IMAGE"
+docker-compose up -d dashboard
 
 if [ $? -eq 0 ]; then
-  log "✅ Containerul $CONTAINER_NAME rulează pe port $PORT"
+  log "✅ Containerul node-dashboard rulează pe port 3005"
 else
-  log "❌ Deploy local a eșuat!"
+  log "❌ Deploy cu docker-compose a eșuat!"
   exit 1
 fi
 
-# ─────────────────────────────────────────────────
-# 6. 📄 Log-uri live
-# ─────────────────────────────────────────────────
 log "📄 Afișăm log-urile containerului:"
-docker logs -f "$CONTAINER_NAME"
+docker-compose logs -f dashboard

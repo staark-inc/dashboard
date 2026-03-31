@@ -12,10 +12,6 @@ RUN --mount=type=secret,id=github_packages_token \
   test -n "$TOKEN"; \
   npm cache clean --force; \
   printf "@staark-inc:registry=https://npm.pkg.github.com/\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > .npmrc; \
-  echo "=== npm config ==="; \
-  npm config ls; \
-  echo "=== .npmrc ==="; \
-  cat .npmrc; \
   npm ci --omit=dev; \
   rm -f .npmrc
 
