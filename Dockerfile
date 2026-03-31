@@ -10,7 +10,7 @@ RUN --mount=type=secret,id=github_packages_token \
   set -eux; \
   TOKEN="$(cat /run/secrets/github_packages_token)"; \
   test -n "$TOKEN"; \
-  printf "@staark-inc:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > .npmrc; \
+  printf "@staark-inc:registry=https://npm.pkg.github.com/\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > .npmrc; \
   npm ci --omit=dev; \
   rm -f .npmrc
 
