@@ -278,4 +278,6 @@ app.post('/logout', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Dashboard running on port ${PORT}`);
+  console.log(`API Base URL: ${API_BASE_URL}`);
+  console.log(`Open http://localhost:${PORT}/login to access the dashboard`);
 });
