@@ -9,6 +9,7 @@ import { Staark, StaarkError } from '@staark-inc/node';
 import router from "./routes/dashboard.js";
 import jwt from 'jsonwebtoken';
 
+const API_BASE_URL = process.env.STAARK_API_BASE_URL || 'https://api.staark-app.cloud/v1';
 const app = express();
 const PORT = process.env.PORT || 3005;
 
@@ -111,7 +112,10 @@ app.get('/pricing', (req, res) => {
 app.use("/dashboard", router);
 
 app.get('/login', (req, res) => {
-  res.render('login', { layout: false });
+  res.render('login', { layout: false, providers: [
+    { url: API_BASE_URL + '/auth/oauth/google', class: 'google', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', label: 'Continuă cu Google' },
+    { url: API_BASE_URL + '/auth/oauth/github', class: 'github', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', label: 'Continuă cu GitHub' }
+  ]});
 });
 
 app.post('/login', async (req, res) => {
@@ -274,5 +278,4 @@ app.post('/logout', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Dashboard running on port ${PORT}`);
-  console.log(`Dashboard running ! Access it at http://localhost:${PORT}`);
 });
