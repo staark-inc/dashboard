@@ -169,7 +169,7 @@ app.post('/login', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 zile
     });
 
-    res.cookie('userId', result.user.id, {
+    res.cookie('userId', result.user?.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
