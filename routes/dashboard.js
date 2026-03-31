@@ -4,6 +4,8 @@ import * as overview  from '../controllers/overviewController.js';
 import * as projects  from '../controllers/projectController.js';
 import * as keys      from '../controllers/keyController.js';
 import * as analytics from '../controllers/analyticsController.js';
+import * as activity  from '../controllers/activityController.js';
+import * as exportCtrl from '../controllers/exportController.js';
 
 const router = express.Router();
 router.use(requireAuth);
@@ -28,5 +30,9 @@ router.post('/keys/generate',     keys.generateKey);
 router.post('/keys/:id/revoke',   keys.revokeKey);
 
 router.get('/analytics', analytics.getAnalytics);
+
+router.get('/activity',          activity.getActivity);
+router.get('/export/keys',       exportCtrl.exportKeys);
+router.get('/export/projects',   exportCtrl.exportProjects);
 
 export default router;

@@ -87,7 +87,7 @@
 
   .table-header {
     display: grid;
-    grid-template-columns: 1fr 160px 100px 80px 50px;
+    grid-template-columns: 1fr 160px 90px 100px 80px 50px;
     gap: 0.5rem;
     padding: 0.65rem 1.1rem;
     font-family: var(--mono);
@@ -101,7 +101,7 @@
 
   .key-row {
     display: grid;
-    grid-template-columns: 1fr 160px 100px 80px 50px;
+    grid-template-columns: 1fr 160px 90px 100px 80px 50px;
     gap: 0.5rem;
     align-items: center;
     padding: 0.8rem 1.1rem;
@@ -143,8 +143,12 @@
   }
 
   .status-pill .pip { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-  .status-pill.active  { color: var(--cyan);  background: var(--cyan-dim);  border: 1px solid rgba(0,229,176,0.2); }
-  .status-pill.revoked { color: var(--red);   background: var(--red-dim);   border: 1px solid rgba(255,77,106,0.2); }
+  .status-pill.active       { color: var(--cyan);   background: var(--cyan-dim);  border: 1px solid rgba(0,229,176,0.2); }
+  .status-pill.revoked      { color: var(--red);    background: var(--red-dim);   border: 1px solid rgba(255,77,106,0.2); }
+  .label-pill               { display: inline-block; font-family: var(--mono); font-size: 0.58rem; padding: 0.1rem 0.38rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .label-pill.production    { color: #f59e0b; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); }
+  .label-pill.development   { color: var(--cyan);   background: var(--cyan-dim);  border: 1px solid rgba(0,229,176,0.2); }
+  .label-pill.read-only     { color: #a78bfa; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25); }
 
   .revoke-btn {
     background: none;
@@ -290,6 +294,7 @@
       <div class="table-header">
         <span>Name</span>
         <span>Key</span>
+        <span>Label</span>
         <span>Created</span>
         <span>Status</span>
         <span></span>
@@ -300,6 +305,11 @@
             <div class="key-name"><%= k.name || 'Unnamed key' %></div>
           </div>
           <div class="key-preview-cell">sk_live_••••<%= k.lastFour || '••••' %></div>
+          <div>
+            <span class="label-pill <%= (k.label || 'development').replace(/[^a-z-]/g,'') %>">
+              <%= k.label || 'development' %>
+            </span>
+          </div>
           <div class="key-date"><%= new Date(k.createdAt || k.created_at * 1000).toLocaleDateString('en-GB') %></div>
           <div>
             <span class="status-pill <%= k.revokedAt ? 'revoked' : 'active' %>">
@@ -335,10 +345,19 @@
           <input type="text" name="name" placeholder="e.g. Production, Mobile app" required />
         </div>
         <div class="form-group">
-          <label>Environment</label>
-          <select name="environment">
-            <option value="live">Live</option>
-            <option value="test">Test</option>
+          <label>Label</label>
+          <select name="label">
+            <option value="development">Development</option>
+            <option value="production">Production</option>
+            <option value="read-only">Read-only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Plan</label>
+          <select name="plan">
+            <option value="free">Free — 300 req/day</option>
+            <option value="pro">Pro — 2,500 req/day</option>
+            <option value="enterprise">Enterprise — 5,000 req/day</option>
           </select>
         </div>
         <button type="submit" class="btn-generate">
