@@ -114,18 +114,24 @@ app.get('/pricing', (req, res) => {
 app.use("/dashboard", router);
 
 app.get('/login', (req, res) => {
-  res.render('login', { layout: false, providers: [
+  const providers = [
     { url: API_BASE_URL + '/auth/oauth/google', class: 'google', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', label: 'Continuă cu Google' },
     { url: API_BASE_URL + '/auth/oauth/github', class: 'github', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', label: 'Continuă cu GitHub' }
-  ]});
+  ];
+  res.render('login', { layout: false, providers });
 });
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  const providers = [
+    { url: API_BASE_URL + '/auth/oauth/google', class: 'google', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', label: 'Continuă cu Google' },
+    { url: API_BASE_URL + '/auth/oauth/github', class: 'github', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', label: 'Continuă cu GitHub' }
+  ];
 
   if (!email || !password) {
     return res.render('login', {
       layout: false,
+      providers,
       error: 'Email și parola sunt obligatorii.'
     });
   }
@@ -163,7 +169,7 @@ app.post('/login', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 zile
     });
 
-    res.cookie('userId', result.user.id, { 
+    res.cookie('userId', result.user.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000
@@ -173,7 +179,7 @@ app.post('/login', async (req, res) => {
 
   } catch (error) {
     const message = error instanceof StaarkError ? error.message : (error?.message ?? 'Email sau parolă incorectă.');
-    res.render('login', { layout: false, error: message });
+    res.render('login', { layout: false, providers, error: message });
   }
 });
 
@@ -183,6 +189,10 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
+  const providers = [
+    { url: API_BASE_URL + '/auth/oauth/google', class: 'google', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', label: 'Continuă cu Google' },
+    { url: API_BASE_URL + '/auth/oauth/github', class: 'github', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', label: 'Continuă cu GitHub' }
+  ];
 
   if (password !== confirmPassword) {
     return res.render('register', {
@@ -208,6 +218,7 @@ app.post('/register', async (req, res) => {
 
     res.render('login', {
       layout: false,
+      providers,
       success: 'Cont creat! Verifică emailul, apoi autentifică-te.'
     });
 
@@ -224,8 +235,12 @@ app.post('/register', async (req, res) => {
 // ── OAuth callback (token arrives as query param from API) ─────────────────
 app.get('/auth/oauth/callback', (req, res) => {
   const { token, refresh, error } = req.query;
+  const providers = [
+    { url: API_BASE_URL + '/auth/oauth/google', class: 'google', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', label: 'Continuă cu Google' },
+    { url: API_BASE_URL + '/auth/oauth/github', class: 'github', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', label: 'Continuă cu GitHub' }
+  ];
   if (error || !token) {
-    return res.render('login', { layout: false, error: error || 'OAuth login failed' });
+    return res.render('login', { layout: false, providers, error: error || 'OAuth login failed' });
   }
   const cookieOpts = { httpOnly: true, secure: process.env.NODE_ENV === 'production' };
   res.cookie('accessToken',  token,   { ...cookieOpts, maxAge: 15 * 60 * 1000 });
