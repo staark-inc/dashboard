@@ -150,12 +150,20 @@ docker push "$IMAGE_NAME:latest"
 # 5. 🔽 Pull + deploy local
 # ─────────────────────────────────────────────────
 log "🔽 Pull imagine pentru deploy local..."
-docker pull "$FULL_IMAGE"
 
-if [ $? -ne 0 ]; then
-  log "❌ Pull-ul imaginii a eșuat!"
-  exit 1
-fi
+# Retry logic pentru pull
+RETRY_COUNT=0
+MAX_RETRIES=3
+until docker pull "$FULL_IMAGE"; do
+  RETRY_COUNT=$((RETRY_COUNT + 1))
+  if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+    log "❌ Pull-ul imaginii a eșuat după $MAX_RETRIES încercări!"
+    exit 1
+  fi
+  log "⚠️  Retry pull ($RETRY_COUNT/$MAX_RETRIES)..."
+  sleep 2
+done
+
 log "✅ Pull reușit: $FULL_IMAGE"
 
 if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
