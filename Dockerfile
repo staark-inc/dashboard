@@ -11,7 +11,14 @@ RUN --mount=type=secret,id=github_packages_token \
   TOKEN="$(cat /run/secrets/github_packages_token)"; \
   test -n "$TOKEN"; \
   printf "@staark-inc:registry=https://npm.pkg.github.com/\n//npm.pkg.github.com/:_authToken=%s\n" "$TOKEN" > .npmrc; \
-  npm ci --omit=dev; \
+  echo "=== npm config ==="; \
+  npm config get registry; \
+  npm --version; \
+  node --version; \
+  echo "=== .npmrc ==="; \
+  cat .npmrc; \
+  echo "=== npm ci ==="; \
+  npm ci --omit=dev --verbose 2>&1 | head -50; \
   rm -f .npmrc
 
 COPY . .
