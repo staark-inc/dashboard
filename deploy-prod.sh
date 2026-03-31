@@ -172,17 +172,18 @@ if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
   log "✅ Container vechi șters"
 fi
 
-log "▶️  Deploying cu docker-compose..."
+log "▶️  Deploying cu docker compose..."
 
 export DASHBOARD_IMAGE="$FULL_IMAGE"
-docker-compose up -d dashboard
+cd /srv/docker/stacks/gateway
+docker compose up -d dashboard
 
 if [ $? -eq 0 ]; then
   log "✅ Containerul node-dashboard rulează pe port 3005"
 else
-  log "❌ Deploy cu docker-compose a eșuat!"
+  log "❌ Deploy cu docker compose a eșuat!"
   exit 1
 fi
 
 log "📄 Afișăm log-urile containerului:"
-docker-compose logs -f dashboard
+docker compose logs -f dashboard
