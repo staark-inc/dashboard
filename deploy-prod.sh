@@ -48,6 +48,12 @@ log "📦 Verificăm repository-ul Git..."
 if ! git rev-parse --is-inside-work-tree &>/dev/null; then
   log "⚠️  Nu suntem într-un repository Git — skip commit/push."
 else
+  # Configurăm git să folosească token-ul pentru autentificare
+  CLEAN_GITHUB_TOKEN=$(echo "$GITHUB_TOKEN" | tr -d '\r\n' | tr -d ' ')
+  git config --global credential.helper store
+  echo "https://oauth2:${CLEAN_GITHUB_TOKEN}@github.com" > ~/.git-credentials
+  chmod 600 ~/.git-credentials
+
   git add -A
 
   if git diff --cached --quiet; then
@@ -66,10 +72,14 @@ else
 
     if [ $? -ne 0 ]; then
       log "❌ Push-ul pe GitHub a eșuat!"
+      rm -f ~/.git-credentials
       exit 1
     fi
     log "✅ Cod urcat pe GitHub"
   fi
+
+  # Curățim credențialele după push
+  rm -f ~/.git-credentials
 fi
 
 # ─────────────────────────────────────────────────
