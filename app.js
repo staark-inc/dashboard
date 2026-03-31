@@ -139,6 +139,11 @@ app.post('/login', async (req, res) => {
     }
     const result = await resp.json();
 
+    // 2FA required
+    if (result.requires_2fa) {
+      return res.render('login-2fa', { layout: false, temp_token: result.temp_token, error: null });
+    }
+
     // Salvează tokens în cookie-uri httpOnly
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
@@ -207,6 +212,42 @@ app.post('/register', async (req, res) => {
       error: message,
       fields: { firstName, lastName, email }
     });
+  }
+});
+
+// ── OAuth callback (token arrives as query param from API) ─────────────────
+app.get('/auth/oauth/callback', (req, res) => {
+  const { token, refresh, error } = req.query;
+  if (error || !token) {
+    return res.render('login', { layout: false, error: error || 'OAuth login failed' });
+  }
+  const cookieOpts = { httpOnly: true, secure: process.env.NODE_ENV === 'production' };
+  res.cookie('accessToken',  token,   { ...cookieOpts, maxAge: 15 * 60 * 1000 });
+  res.cookie('refreshToken', refresh, { ...cookieOpts, maxAge: 30 * 24 * 60 * 60 * 1000 });
+  res.redirect('/dashboard');
+});
+
+// ── 2FA validate ───────────────────────────────────────────────────────────
+app.post('/auth/2fa', async (req, res) => {
+  const { temp_token, code } = req.body;
+  try {
+    const resp = await fetch('https://api.staark-app.cloud/v1/auth/totp/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ temp_token, code }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      return res.render('login-2fa', { layout: false, temp_token, error: err.error?.message || 'Invalid code' });
+    }
+    const result = await resp.json();
+    const cookieOpts = { httpOnly: true, secure: process.env.NODE_ENV === 'production' };
+    res.cookie('accessToken',  result.accessToken,  { ...cookieOpts, maxAge: 15 * 60 * 1000 });
+    res.cookie('refreshToken', result.refreshToken, { ...cookieOpts, maxAge: 30 * 24 * 60 * 60 * 1000 });
+    if (result.user?.id) res.cookie('userId', result.user.id, { ...cookieOpts, maxAge: 30 * 24 * 60 * 60 * 1000 });
+    res.redirect('/dashboard');
+  } catch (err) {
+    res.render('login-2fa', { layout: false, temp_token, error: 'Something went wrong' });
   }
 });
 

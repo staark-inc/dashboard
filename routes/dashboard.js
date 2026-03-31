@@ -4,8 +4,10 @@ import * as overview  from '../controllers/overviewController.js';
 import * as projects  from '../controllers/projectController.js';
 import * as keys      from '../controllers/keyController.js';
 import * as analytics from '../controllers/analyticsController.js';
-import * as activity  from '../controllers/activityController.js';
-import * as exportCtrl from '../controllers/exportController.js';
+import * as activity     from '../controllers/activityController.js';
+import * as exportCtrl   from '../controllers/exportController.js';
+import * as settings     from '../controllers/settingsController.js';
+import * as webhooksCtrl from '../controllers/webhooksController.js';
 
 const router = express.Router();
 router.use(requireAuth);
@@ -34,5 +36,16 @@ router.get('/analytics', analytics.getAnalytics);
 router.get('/activity',          activity.getActivity);
 router.get('/export/keys',       exportCtrl.exportKeys);
 router.get('/export/projects',   exportCtrl.exportProjects);
+
+router.get('/settings',                settings.getSettings);
+router.post('/settings/totp/setup',    settings.setupTotp);
+router.post('/settings/totp/enable',   settings.enableTotp);
+router.post('/settings/totp/disable',  settings.disableTotp);
+
+router.get('/webhooks',                              webhooksCtrl.listWebhooks);
+router.post('/webhooks',                             webhooksCtrl.createWebhook);
+router.post('/webhooks/:id/delete',                  webhooksCtrl.deleteWebhook);
+router.get('/webhooks/:id/deliveries',               webhooksCtrl.listDeliveries);
+router.post('/webhooks/:id/deliveries/:deliveryId/redeliver', webhooksCtrl.redeliverWebhook);
 
 export default router;

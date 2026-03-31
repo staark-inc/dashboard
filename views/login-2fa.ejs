@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two-Factor Auth — Staark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #2e3d36; --surface: #374942; --surface2: #415650;
+      --border: #4a5e56; --border2: rgba(77,170,128,0.28);
+      --text: #e2e8e4; --text-mid: #a0cba6; --text-dim: #4a7a70;
+      --violet: #4daa80; --violet-dim: rgba(77,170,128,0.13);
+      --red: #e06070; --red-dim: rgba(224,96,112,0.10);
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; -webkit-font-smoothing: antialiased; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 2.2rem;
+      width: 340px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+    }
+
+    .icon { font-size: 2rem; text-align: center; margin-bottom: 0.8rem; }
+
+    .title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; font-weight: 800; color: #fff; text-align: center; margin-bottom: 0.4rem; }
+    .subtitle { font-size: 0.78rem; color: var(--text-mid); text-align: center; margin-bottom: 1.6rem; line-height: 1.5; }
+
+    .error-box { background: var(--red-dim); border: 1px solid rgba(224,96,112,0.3); color: #f07080; padding: 0.6rem 0.9rem; border-radius: 7px; font-size: 0.78rem; margin-bottom: 1rem; text-align: center; }
+
+    label { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.35rem; }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      font-size: 1.4rem;
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.35em;
+      text-align: center;
+      transition: border-color 0.15s;
+      margin-bottom: 1.2rem;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--violet); }
+
+    button {
+      width: 100%;
+      background: var(--violet);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.65rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      margin-bottom: 0.8rem;
+    }
+    button:hover { opacity: 0.85; }
+
+    .back { display: block; text-align: center; font-size: 0.75rem; color: var(--text-dim); text-decoration: none; }
+    .back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🔐</div>
+    <div class="title">Two-Factor Auth</div>
+    <div class="subtitle">Enter the 6-digit code from your authenticator app</div>
+
+    <% if (error) { %><div class="error-box"><%= error %></div><% } %>
+
+    <form action="/auth/2fa" method="POST">
+      <input type="hidden" name="temp_token" value="<%= temp_token %>" />
+      <label>Authentication Code</label>
+      <input type="text" name="code" maxlength="6" inputmode="numeric"
+             autocomplete="one-time-code" placeholder="000000" autofocus required />
+      <button type="submit">Verify</button>
+    </form>
+
+    <a href="/login" class="back">← Back to login</a>
+  </div>
+</body>
+</html>
