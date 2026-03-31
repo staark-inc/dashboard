@@ -40,7 +40,41 @@ FULL_IMAGE="$IMAGE_NAME:$IMAGE_TAG"
 
 log "🟢 Tag-ul imaginii va fi: $FULL_IMAGE"
 
-# Autentificare GHCR
+# ─────────────────────────────────────────────────
+# 1. 📦 Git commit + push (înainte de orice altceva)
+# ─────────────────────────────────────────────────
+log "📦 Verificăm repository-ul Git..."
+
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+  log "⚠️  Nu suntem într-un repository Git — skip commit/push."
+else
+  git add -A
+
+  if git diff --cached --quiet; then
+    log "ℹ️  Nicio modificare de commit — codul e deja sincronizat."
+  else
+    COMMIT_MSG="deploy: $IMAGE_TAG"
+    git commit -m "$COMMIT_MSG"
+
+    if [ $? -ne 0 ]; then
+      log "❌ Commit-ul a eșuat!"
+      exit 1
+    fi
+    log "✅ Commit reușit: \"$COMMIT_MSG\""
+
+    git push
+
+    if [ $? -ne 0 ]; then
+      log "❌ Push-ul pe GitHub a eșuat!"
+      exit 1
+    fi
+    log "✅ Cod urcat pe GitHub"
+  fi
+fi
+
+# ─────────────────────────────────────────────────
+# 2. 🔑 Autentificare GHCR
+# ─────────────────────────────────────────────────
 log "🔑 Autentificare la GHCR..."
 CLEAN_TOKEN=$(echo "$GITHUB_TOKEN" | tr -d '\r\n' | tr -d ' ')
 echo "$CLEAN_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
@@ -52,11 +86,10 @@ fi
 log "✅ Autentificare GHCR reușită"
 
 # ─────────────────────────────────────────────────
-# 🔽 Pull ultima imagine din GHCR pentru layer-e fresh
+# 3. 🔽 Pull ultima imagine din GHCR (layer-e fresh)
 # ─────────────────────────────────────────────────
 log "🔽 Pull ultima imagine din GHCR pentru layer-e fresh..."
 
-# Încercăm mai întâi :latest, altfel cel mai recent tag
 docker pull "$IMAGE_NAME:latest" 2>/dev/null
 if [ $? -ne 0 ]; then
   log "ℹ️  Tag :latest nu există — căutăm cel mai recent tag..."
@@ -72,7 +105,7 @@ else
 fi
 
 # ─────────────────────────────────────────────────
-# 🔨 Build fresh, fără cache, cu secret
+# 4. 🔨 Build fresh + push pe GHCR
 # ─────────────────────────────────────────────────
 log "🔨 Începem build-ul imaginii (--no-cache, layer-e de bază fresh)..."
 
@@ -90,7 +123,6 @@ if [ $? -ne 0 ]; then
 fi
 log "✅ Build reușit: $FULL_IMAGE"
 
-# 🚀 Push pe GHCR
 log "🚀 Push pe GHCR..."
 docker push "$FULL_IMAGE"
 
@@ -100,12 +132,13 @@ if [ $? -ne 0 ]; then
 fi
 log "✅ Push reușit: $FULL_IMAGE"
 
-# Actualizăm și tag-ul :latest pe GHCR
 log "🏷️  Actualizăm tag-ul :latest..."
 docker tag "$FULL_IMAGE" "$IMAGE_NAME:latest"
 docker push "$IMAGE_NAME:latest"
 
-# 🔽 Pull și verificare imagine
+# ─────────────────────────────────────────────────
+# 5. 🔽 Pull + deploy local
+# ─────────────────────────────────────────────────
 log "🔽 Pull imagine pentru deploy local..."
 docker pull "$FULL_IMAGE"
 
@@ -115,14 +148,12 @@ if [ $? -ne 0 ]; then
 fi
 log "✅ Pull reușit: $FULL_IMAGE"
 
-# Oprim și ștergem containerul vechi dacă există
 if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
   log "🛑 Oprire și ștergere container vechi..."
   docker rm -f "$CONTAINER_NAME"
   log "✅ Container vechi șters"
 fi
 
-# Rulăm containerul nou
 log "▶️  Rulăm containerul nou..."
 docker run -d \
   --name "$CONTAINER_NAME" \
@@ -138,41 +169,7 @@ else
 fi
 
 # ─────────────────────────────────────────────────
-# 📦 Git commit + push după deploy reușit
+# 6. 📄 Log-uri live
 # ─────────────────────────────────────────────────
-log "📦 Commit și push pe GitHub..."
-
-# Verificăm dacă suntem într-un repo Git
-if ! git rev-parse --is-inside-work-tree &>/dev/null; then
-  log "⚠️  Nu suntem într-un repository Git — skip commit/push."
-else
-  git add -A
-
-  # Commit doar dacă există modificări
-  if git diff --cached --quiet; then
-    log "ℹ️  Nicio modificare de commit."
-  else
-    COMMIT_MSG="deploy: $IMAGE_TAG"
-    git commit -m "$COMMIT_MSG"
-
-    if [ $? -eq 0 ]; then
-      log "✅ Commit reușit: \"$COMMIT_MSG\""
-    else
-      log "❌ Commit-ul a eșuat!"
-      exit 1
-    fi
-
-    git push
-
-    if [ $? -eq 0 ]; then
-      log "✅ Push pe GitHub reușit"
-    else
-      log "❌ Push-ul pe GitHub a eșuat!"
-      exit 1
-    fi
-  fi
-fi
-
-# Afișăm log-urile în timp real
 log "📄 Afișăm log-urile containerului:"
 docker logs -f "$CONTAINER_NAME"
