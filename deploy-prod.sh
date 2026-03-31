@@ -1,136 +1,160 @@
 #!/bin/bash
 
+# Funcție de log cu timestamp
 log() {
   echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
 }
 
+# Configurație
 ENV_FILE=".env"
 IMAGE_NAME="ghcr.io/staark-inc/dashboard"
 PORT=3005
 CONTAINER_NAME="dashboard"
 
-log "Incepem procesul de deploy"
+log "🔹 Începem procesul de deploy"
 
+# Verificăm dacă .env există
 if [ ! -f "$ENV_FILE" ]; then
-  log "EROARE: Fisierul $ENV_FILE nu exista!"
+  log "❌ Fișierul $ENV_FILE nu există! Creează-l cu GITHUB_TOKEN și GITHUB_PACKAGES_TOKEN."
   exit 1
 fi
 
+# Citim token-urile din .env
 GITHUB_TOKEN=$(grep '^GITHUB_TOKEN=' "$ENV_FILE" | cut -d '=' -f2 | tr -d '[:space:]')
 GITHUB_PACKAGES_TOKEN=$(grep '^GITHUB_PACKAGES_TOKEN=' "$ENV_FILE" | cut -d '=' -f2 | tr -d '[:space:]')
 GHCR_USERNAME=$(grep '^GHCR_USERNAME=' "$ENV_FILE" | cut -d '=' -f2 | tr -d '[:space:]')
 
 if [ -z "$GITHUB_TOKEN" ]; then
-  log "EROARE: GITHUB_TOKEN nu este setat in $ENV_FILE"
+  log "❌ GITHUB_TOKEN nu este setat în $ENV_FILE"
   exit 1
 fi
 
 if [ -z "$GITHUB_PACKAGES_TOKEN" ]; then
-  log "EROARE: GITHUB_PACKAGES_TOKEN nu este setat in $ENV_FILE"
+  log "❌ GITHUB_PACKAGES_TOKEN nu este setat în $ENV_FILE"
   exit 1
 fi
 
+# Generăm tag unic
 IMAGE_TAG=$(date +%Y%m%d%H%M%S)
 FULL_IMAGE="$IMAGE_NAME:$IMAGE_TAG"
-log "Tag-ul imaginii va fi: $FULL_IMAGE"
 
-# ─── 1. Git commit + push ───────────────────────
-log "Verificam repository-ul Git..."
+log "🟢 Tag-ul imaginii va fi: $FULL_IMAGE"
+
+# ─────────────────────────────────────────────────
+# 1. 📦 Git commit + push (înainte de orice altceva)
+# ─────────────────────────────────────────────────
+log "📦 Verificăm repository-ul Git..."
 
 if ! git rev-parse --is-inside-work-tree &>/dev/null; then
-  log "AVERTISMENT: Nu suntem intr-un repository Git - skip commit/push."
+  log "⚠️  Nu suntem într-un repository Git — skip commit/push."
 else
   git add -A
+
   if git diff --cached --quiet; then
-    log "Nicio modificare de commit - codul e deja sincronizat."
+    log "ℹ️  Nicio modificare de commit — codul e deja sincronizat."
   else
     COMMIT_MSG="deploy: $IMAGE_TAG"
     git commit -m "$COMMIT_MSG"
+
     if [ $? -ne 0 ]; then
-      log "EROARE: Commit-ul a esuat!"
+      log "❌ Commit-ul a eșuat!"
       exit 1
     fi
-    log "Commit reusit: $COMMIT_MSG"
+    log "✅ Commit reușit: \"$COMMIT_MSG\""
 
     git push
+
     if [ $? -ne 0 ]; then
-      log "EROARE: Push-ul pe GitHub a esuat!"
+      log "❌ Push-ul pe GitHub a eșuat!"
       exit 1
     fi
-    log "Cod urcat pe GitHub"
+    log "✅ Cod urcat pe GitHub"
   fi
 fi
 
-# ─── 2. Autentificare GHCR ──────────────────────
-log "Autentificare la GHCR..."
-CLEAN_TOKEN=$(echo "$GITHUB_TOKEN" | tr -d '\r\n ')
+# ─────────────────────────────────────────────────
+# 2. 🔑 Autentificare GHCR
+# ─────────────────────────────────────────────────
+log "🔑 Autentificare la GHCR..."
+CLEAN_TOKEN=$(echo "$GITHUB_TOKEN" | tr -d '\r\n' | tr -d ' ')
 echo "$CLEAN_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
 if [ $? -ne 0 ]; then
-  log "EROARE: Autentificarea la GHCR a esuat!"
+  log "❌ Autentificarea la GHCR a eșuat!"
   exit 1
 fi
-log "Autentificare GHCR reusita"
+log "✅ Autentificare GHCR reușită"
 
-# ─── 3. Pull ultima imagine (layer-e fresh) ─────
-log "Pull ultima imagine din GHCR pentru layer-e fresh..."
+# ─────────────────────────────────────────────────
+# 3. 🔽 Pull ultima imagine din GHCR (layer-e fresh)
+# ─────────────────────────────────────────────────
+log "🔽 Pull ultima imagine din GHCR pentru layer-e fresh..."
+
 docker pull "$IMAGE_NAME:latest" 2>/dev/null
 if [ $? -ne 0 ]; then
-  log "Tag :latest nu exista - continuam cu build fresh."
+  log "ℹ️  Tag :latest nu există — căutăm cel mai recent tag..."
+  LATEST_REMOTE=$(docker image ls "$IMAGE_NAME" --format "{{.Tag}}" | sort -r | head -n1)
+  if [ -n "$LATEST_REMOTE" ]; then
+    docker pull "$IMAGE_NAME:$LATEST_REMOTE"
+    log "✅ Pull reușit: $IMAGE_NAME:$LATEST_REMOTE"
+  else
+    log "⚠️  Nu există nicio imagine pe GHCR — continuăm cu build fresh fără cache de bază."
+  fi
 else
-  log "Pull reusit: $IMAGE_NAME:latest"
+  log "✅ Pull reușit: $IMAGE_NAME:latest"
 fi
 
-# ─── 4. Build ───────────────────────────────────
-log "Build imagine (--no-cache, layer-e de baza fresh)..."
+# ─────────────────────────────────────────────────
+# 4. 🔨 Build fresh + push pe GHCR
+# ─────────────────────────────────────────────────
+log "🔨 Începem build-ul imaginii (--no-cache, layer-e de bază fresh)..."
 
-# Scriem token-ul intr-un fisier temporar pentru --secret
-SECRET_FILE=$(mktemp)
-printf '%s' "$GITHUB_PACKAGES_TOKEN" > "$SECRET_FILE"
+export GITHUB_PACKAGES_TOKEN
 
 DOCKER_BUILDKIT=1 docker build \
   --no-cache \
   --pull \
-  --secret id=github_packages_token,src="$SECRET_FILE" \
+  --secret id=github_packages_token,env=GITHUB_PACKAGES_TOKEN \
   -t "$FULL_IMAGE" .
 
-BUILD_EXIT=$?
-rm -f "$SECRET_FILE"
-
-if [ $BUILD_EXIT -ne 0 ]; then
-  log "EROARE: Build-ul a esuat!"
-  exit 1
-fi
-log "Build reusit: $FULL_IMAGE"
-
-# ─── 5. Push pe GHCR ────────────────────────────
-log "Push pe GHCR..."
-docker push "$FULL_IMAGE"
 if [ $? -ne 0 ]; then
-  log "EROARE: Push-ul a esuat!"
+  log "❌ Build-ul a eșuat!"
   exit 1
 fi
-log "Push reusit: $FULL_IMAGE"
+log "✅ Build reușit: $FULL_IMAGE"
 
-log "Actualizam tag-ul :latest..."
+log "🚀 Push pe GHCR..."
+docker push "$FULL_IMAGE"
+
+if [ $? -ne 0 ]; then
+  log "❌ Push-ul a eșuat!"
+  exit 1
+fi
+log "✅ Push reușit: $FULL_IMAGE"
+
+log "🏷️  Actualizăm tag-ul :latest..."
 docker tag "$FULL_IMAGE" "$IMAGE_NAME:latest"
 docker push "$IMAGE_NAME:latest"
 
-# ─── 6. Deploy local ────────────────────────────
-log "Pull imagine pentru deploy local..."
+# ─────────────────────────────────────────────────
+# 5. 🔽 Pull + deploy local
+# ─────────────────────────────────────────────────
+log "🔽 Pull imagine pentru deploy local..."
 docker pull "$FULL_IMAGE"
+
 if [ $? -ne 0 ]; then
-  log "EROARE: Pull-ul imaginii a esuat!"
+  log "❌ Pull-ul imaginii a eșuat!"
   exit 1
 fi
-log "Pull reusit: $FULL_IMAGE"
+log "✅ Pull reușit: $FULL_IMAGE"
 
 if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
-  log "Oprire si stergere container vechi..."
+  log "🛑 Oprire și ștergere container vechi..."
   docker rm -f "$CONTAINER_NAME"
-  log "Container vechi sters"
+  log "✅ Container vechi șters"
 fi
 
-log "Rulam containerul nou..."
+log "▶️  Rulăm containerul nou..."
 docker run -d \
   --name "$CONTAINER_NAME" \
   --env-file "$ENV_FILE" \
@@ -138,12 +162,14 @@ docker run -d \
   "$FULL_IMAGE"
 
 if [ $? -eq 0 ]; then
-  log "Containerul $CONTAINER_NAME ruleaza pe port $PORT"
+  log "✅ Containerul $CONTAINER_NAME rulează pe port $PORT"
 else
-  log "EROARE: Deploy local a esuat!"
+  log "❌ Deploy local a eșuat!"
   exit 1
 fi
 
-# ─── 7. Log-uri live ────────────────────────────
-log "Afisam log-urile containerului:"
+# ─────────────────────────────────────────────────
+# 6. 📄 Log-uri live
+# ─────────────────────────────────────────────────
+log "📄 Afișăm log-urile containerului:"
 docker logs -f "$CONTAINER_NAME"
