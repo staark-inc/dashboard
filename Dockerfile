@@ -1,20 +1,22 @@
 # syntax=docker/dockerfile:1.4
-FROM node:20-alpine
+FROM ghcr.io/staark-inc/dashboard:latest AS base
 
 WORKDIR /app
 
-ARG GITHUB_PACKAGES_TOKEN
-
 COPY package*.json ./
 
-RUN test -n "$GITHUB_PACKAGES_TOKEN" || (echo "GITHUB_PACKAGES_TOKEN missing" && exit 1)
-
-RUN echo "@staark-inc:registry=https://npm.pkg.github.com" > /root/.npmrc && \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}" >> /root/.npmrc && \
+# Folosim secret BuildKit, citit din .env
+# Folosim secret BuildKit
+RUN --mount=type=secret,id=github_packages_token \
+    TOKEN=$(cat /run/secrets/github_packages_token | tr -d '\r\n') && \
+    echo "@staark-inc:registry=https://npm.pkg.github.com" > .npmrc && \
+    echo "//npm.pkg.github.com/:_authToken=$TOKEN" >> .npmrc && \
+    echo "always-auth=true" >> .npmrc && \
     npm install --omit=dev && \
-    rm -f /root/.npmrc
+    rm -f .npmrc
 
 COPY . .
 
 EXPOSE 3005
+
 CMD ["npm", "run", "start"]
